@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import tkinter.messagebox as msgbox
 
 test_columns = ["입고번호","거래처코드","거래처명","입고 담당자","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명"]
 
@@ -10,7 +11,7 @@ class Receiving(tk.Frame):
         self.root = root
 
         self.frame1 = tk.LabelFrame(self, text="입력 필드",width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
-        self.frame2 = tk.Frame(self, width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
+        self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
         # self.frame3 = tk.Frame(self, width=950, height=350, bg="green")  # 왼쪽 아래 구역
         # self.frame4 = tk.Frame(self, width=350, height=350, bg="blue")  # 오른쪽 아래 구역
         # (frame 3, 4가 하나라면 아래와 같이 사용)
@@ -18,7 +19,7 @@ class Receiving(tk.Frame):
         # self.label=tk.Label(self.frame_top,text="123")
         # self.label= self.label.pack()
 
-        self.testframe = tk.LabelFrame(self.frame2,text="조회 필드",width=250,height=350, bg="lightgrey")
+        self.testframe = tk.Frame(self.frame2,width=250,height=350, bg="lightgrey")
         self.testframe2 = tk.Frame(self.frame2,width=100,height=350, bg="lightgrey")
         # self.testlabelframe = tk.LabelFrame(self.frame1,width=)
         # frame 크기 자동 축소 방지 (pack/grid)
@@ -60,6 +61,24 @@ class Receiving(tk.Frame):
         self.label5 = ttk.Label(self.frame1, text="테스트용 라벨")
         self.entry5 = ttk.Entry(self.frame1)
 
+        self.label6 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry6 = ttk.Entry(self.frame1)
+
+        self.label7 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry7 = ttk.Entry(self.frame1)
+
+        self.label8 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry8 = ttk.Entry(self.frame1)
+
+        self.label9 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry9 = ttk.Entry(self.frame1)
+
+        self.label10 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry10 = ttk.Entry(self.frame1)
+
+        self.label11 = ttk.Label(self.frame1, text="테스트용 라벨")
+        self.entry11 = ttk.Entry(self.frame1)
+
         # 조회 필드 테스트용 엔트리
         self.tlabel1 = ttk.Label(self.testframe, text="테스트용 라벨")
         self.tentry1 = ttk.Entry(self.testframe)
@@ -92,6 +111,24 @@ class Receiving(tk.Frame):
         self.label5.grid(row=4, column=0, padx=10, pady=10)
         self.entry5.grid(row=4, column=1, padx=10, pady=10)
 
+        self.label6.grid(row=5, column=0, padx=10, pady=10)
+        self.entry6.grid(row=5, column=1, padx=10, pady=10)
+
+        self.label7.grid(row=6, column=0, padx=10, pady=10)
+        self.entry7.grid(row=6, column=1, padx=10, pady=10)
+
+        self.label8.grid(row=7, column=0, padx=10, pady=10)
+        self.entry8.grid(row=7, column=1, padx=10, pady=10)
+
+        self.label9.grid(row=0, column=2, padx=10, pady=10)
+        self.entry9.grid(row=0, column=3, padx=10, pady=10)
+
+        self.label10.grid(row=1, column=2, padx=10, pady=10)
+        self.entry10.grid(row=1, column=3, padx=10, pady=10)
+
+        self.label11.grid(row=2, column=2, padx=10, pady=10)
+        self.entry11.grid(row=2, column=3, padx=10, pady=10)
+
         #조회 필드 테스트용 엔트리 배치
         self.tlabel1.grid(row=0, column=0, padx=5, pady=5)
         self.tentry1.grid(row=0, column=1, padx=5, pady=5)
@@ -111,20 +148,20 @@ class Receiving(tk.Frame):
 
         # CRUD 버튼
         self.test_button = ttk.Button(self.testframe2, text= "조회")
-        self.test_button.grid(row=0, column=1)
-        self.test_button.place(x=10,y=20)
+        self.test_button.grid(row=0, column=1,pady=5)
+        # self.test_button.place(y=5)
 
         self.test_button2 = ttk.Button(self.testframe2, text= "신규")
-        self.test_button2.grid(row=1, column=1)
-        self.test_button2.place(x=10,y=60)
+        self.test_button2.grid(row=1, column=1,pady=5)
+        # self.test_button2.place(x=10,y=60)
 
         self.test_button3 = ttk.Button(self.testframe2, text= "생성")
-        self.test_button3.grid(row=2, column=1)
-        self.test_button3.place(x=10,y=100)
+        self.test_button3.grid(row=2, column=1,pady=5)
+        # self.test_button3.place(x=10,y=100)
         
         self.test_button3 = ttk.Button(self.testframe2, text= "저장")
-        self.test_button3.grid(row=3, column=1)
-        self.test_button3.place(x=10,y=140)
+        self.test_button3.grid(row=3, column=1,pady=5)
+        # self.test_button3.place(x=10,y=140)
 
         self.test_treeview = ttk.Treeview(self.frame3, columns=test_columns,displaycolumns=test_columns)
         self.test_treeview.grid(row=0, column=0)
@@ -135,9 +172,10 @@ class Receiving(tk.Frame):
         self.scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.test_treeview.xview())
         self.scrollbar.pack(side="bottom", fill="x")
         self.test_treeview.configure(xscrollcommand=self.scrollbar.set)
+    #
+    # def
 
-
-
+#
 
 if __name__ == "__main__":
     r = tk.Tk()
