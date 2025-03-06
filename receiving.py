@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
 
-test_columns = ["입고번호","거래처코드","거래처명","입고 담당자","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명","거래처명"]
+test_columns = ["입고번호","거래처코드","거래처명","입고 담당자","단가","수량","단위","발주번호","생산지시서 코드","자재명","자재코드"]
 
 
 class Receiving(tk.Frame):
@@ -10,7 +10,7 @@ class Receiving(tk.Frame):
         super().__init__(root, width=1300, height=700)
         self.root = root
 
-        self.frame1 = tk.LabelFrame(self, text="입력 필드",width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
+        self.frame1 = tk.Frame(self, width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
         self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
         # self.frame3 = tk.Frame(self, width=950, height=350, bg="green")  # 왼쪽 아래 구역
         # self.frame4 = tk.Frame(self, width=350, height=350, bg="blue")  # 오른쪽 아래 구역
@@ -147,7 +147,7 @@ class Receiving(tk.Frame):
 
 
         # CRUD 버튼
-        self.test_button = ttk.Button(self.testframe2, text= "조회")
+        self.test_button = ttk.Button(self.testframe2, text= "조회", command=self.check_data)
         self.test_button.grid(row=0, column=1,pady=5)
         # self.test_button.place(y=5)
 
@@ -158,7 +158,7 @@ class Receiving(tk.Frame):
         self.test_button3 = ttk.Button(self.testframe2, text= "생성")
         self.test_button3.grid(row=2, column=1,pady=5)
         # self.test_button3.place(x=10,y=100)
-        
+
         self.test_button3 = ttk.Button(self.testframe2, text= "저장")
         self.test_button3.grid(row=3, column=1,pady=5)
         # self.test_button3.place(x=10,y=140)
@@ -169,21 +169,49 @@ class Receiving(tk.Frame):
         # self.test_treeview.column("입고번호", width=1000, anchor="center")
         # self.test_treeview.heading("입고번호", text="입고번호", anchor="center")
         #
-        # self.scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.test_treeview.xview())
-        # self.scrollbar.pack(side="bottom", fill="x")
-        # self.test_treeview.configure(xscrollcommand=self.scrollbar.set)
 
-        self.test_treeview = ttk.Treeview(self.frame1, columns=test_columns,displaycolumns=test_columns)
-        self.test_treeview.grid(row=0, column=0, padx=5, pady= 5)
+        # frame1 내부에서 row/column 크기 조정 가능하도록 설정
+        # self.frame1.grid_rowconfigure(0, weight=1)  # 행이 늘어나면 Treeview도 늘어남
+        # self.frame1.grid_columnconfigure(0, weight=1)  # 열이 늘어나면 Treeview도 늘어남
+        #
+        # self.test_treeview = ttk.Treeview(self.frame1, columns=test_columns,displaycolumns=test_columns)
+        # self.test_treeview.grid(row=0, column=0, pady= 5 , sticky="nsew")
+        #
+        # for i in test_columns:
+        #     self.test_treeview.column(i, width=100, anchor="center")
+        #     self.test_treeview.heading(i, text=i, anchor="center")
+        #
+        # self.scrollbar_y = ttk.Scrollbar(self.frame1, orient="vertical", command=self.test_treeview.yview)
+        # self.scrollbar_y.grid(row=0, column=1, sticky="ns")
+        # self.test_treeview.configure(yscrollcommand=self.scrollbar_y.set)
+        #
+        # self.scrollbar_x = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.test_treeview.xview)
+        # self.scrollbar_x.grid(row=1, column=0, sticky="ew")
+        # self.test_treeview.configure(xscrollcommand=self.scrollbar_x.set)
+        #
+        # self.test_treeview["show"] = "headings"
 
-        self.test_treeview.column("입고번호", width=100, anchor="center")
-        self.test_treeview.heading("입고번호", text="입고번호", anchor="center")
+    def check_data(self):
+        # frame1 내부에서 row/column 크기 조정 가능하도록 설정
+        self.frame1.grid_rowconfigure(0, weight=1)  # 행이 늘어나면 Treeview도 늘어남
+        self.frame1.grid_columnconfigure(0, weight=1)  # 열이 늘어나면 Treeview도 늘어남
 
-        self.scrollbar = ttk.Scrollbar(self.frame1, orient="vertical", command=self.test_treeview.yview)
-        self.scrollbar.pack(side="right", fill="y",padx = 5, pady= 5)
-        self.test_treeview.configure(yscrollcommand=self.scrollbar.set)
+        self.test_treeview = ttk.Treeview(self.frame1, columns=test_columns, displaycolumns=test_columns)
+        self.test_treeview.grid(row=0, column=0, pady=5, sticky="nsew")
 
+        for i in test_columns:
+            self.test_treeview.column(i, width=100, anchor="center")
+            self.test_treeview.heading(i, text=i, anchor="center")
 
+        self.scrollbar_y = ttk.Scrollbar(self.frame1, orient="vertical", command=self.test_treeview.yview)
+        self.scrollbar_y.grid(row=0, column=1, sticky="ns")
+        self.test_treeview.configure(yscrollcommand=self.scrollbar_y.set)
+
+        self.scrollbar_x = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.test_treeview.xview)
+        self.scrollbar_x.grid(row=1, column=0, sticky="ew")
+        self.test_treeview.configure(xscrollcommand=self.scrollbar_x.set)
+
+        self.test_treeview["show"] = "headings"
 
 
 if __name__ == "__main__":
