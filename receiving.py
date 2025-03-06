@@ -96,38 +96,38 @@ class Receiving(tk.Frame):
         self.tentry5 = ttk.Entry(self.testframe)
 
         #생성, 신규 필드 테스트용 엔트리 배치
-        self.label1.grid(row=0, column=0, padx=10, pady=10)
-        self.entry1.grid(row=0, column=1, padx=10, pady=10)
-
-        self.label2.grid(row=1, column=0, padx=10, pady=10)
-        self.entry2.grid(row=1, column=1, padx=10, pady=10)
-
-        self.label3.grid(row=2, column=0, padx=10, pady=10)
-        self.entry3.grid(row=2, column=1, padx=10, pady=10)
-
-        self.label4.grid(row=3, column=0, padx=10, pady=10)
-        self.entry4.grid(row=3, column=1, padx=10, pady=10)
-
-        self.label5.grid(row=4, column=0, padx=10, pady=10)
-        self.entry5.grid(row=4, column=1, padx=10, pady=10)
-
-        self.label6.grid(row=5, column=0, padx=10, pady=10)
-        self.entry6.grid(row=5, column=1, padx=10, pady=10)
-
-        self.label7.grid(row=6, column=0, padx=10, pady=10)
-        self.entry7.grid(row=6, column=1, padx=10, pady=10)
-
-        self.label8.grid(row=7, column=0, padx=10, pady=10)
-        self.entry8.grid(row=7, column=1, padx=10, pady=10)
-
-        self.label9.grid(row=0, column=2, padx=10, pady=10)
-        self.entry9.grid(row=0, column=3, padx=10, pady=10)
-
-        self.label10.grid(row=1, column=2, padx=10, pady=10)
-        self.entry10.grid(row=1, column=3, padx=10, pady=10)
-
-        self.label11.grid(row=2, column=2, padx=10, pady=10)
-        self.entry11.grid(row=2, column=3, padx=10, pady=10)
+        # self.label1.grid(row=0, column=0, padx=10, pady=10)
+        # self.entry1.grid(row=0, column=1, padx=10, pady=10)
+        #
+        # self.label2.grid(row=1, column=0, padx=10, pady=10)
+        # self.entry2.grid(row=1, column=1, padx=10, pady=10)
+        #
+        # self.label3.grid(row=2, column=0, padx=10, pady=10)
+        # self.entry3.grid(row=2, column=1, padx=10, pady=10)
+        #
+        # self.label4.grid(row=3, column=0, padx=10, pady=10)
+        # self.entry4.grid(row=3, column=1, padx=10, pady=10)
+        #
+        # self.label5.grid(row=4, column=0, padx=10, pady=10)
+        # self.entry5.grid(row=4, column=1, padx=10, pady=10)
+        #
+        # self.label6.grid(row=5, column=0, padx=10, pady=10)
+        # self.entry6.grid(row=5, column=1, padx=10, pady=10)
+        #
+        # self.label7.grid(row=6, column=0, padx=10, pady=10)
+        # self.entry7.grid(row=6, column=1, padx=10, pady=10)
+        #
+        # self.label8.grid(row=7, column=0, padx=10, pady=10)
+        # self.entry8.grid(row=7, column=1, padx=10, pady=10)
+        #
+        # self.label9.grid(row=0, column=2, padx=10, pady=10)
+        # self.entry9.grid(row=0, column=3, padx=10, pady=10)
+        #
+        # self.label10.grid(row=1, column=2, padx=10, pady=10)
+        # self.entry10.grid(row=1, column=3, padx=10, pady=10)
+        #
+        # self.label11.grid(row=2, column=2, padx=10, pady=10)
+        # self.entry11.grid(row=2, column=3, padx=10, pady=10)
 
         #조회 필드 테스트용 엔트리 배치
         self.tlabel1.grid(row=0, column=0, padx=5, pady=5)
@@ -172,8 +172,18 @@ class Receiving(tk.Frame):
         # self.scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.test_treeview.xview())
         # self.scrollbar.pack(side="bottom", fill="x")
         # self.test_treeview.configure(xscrollcommand=self.scrollbar.set)
-    #
-    # def
+
+        self.test_treeview = ttk.Treeview(self.frame1, columns=test_columns,displaycolumns=test_columns)
+        self.test_treeview.grid(row=0, column=0, padx=5, pady= 5)
+
+        self.test_treeview.column("입고번호", width=100, anchor="center")
+        self.test_treeview.heading("입고번호", text="입고번호", anchor="center")
+
+        self.scrollbar = ttk.Scrollbar(self.frame1, orient="vertical", command=self.test_treeview.yview)
+        self.scrollbar.pack(side="right", fill="y",padx = 5, pady= 5)
+        self.test_treeview.configure(yscrollcommand=self.scrollbar.set)
+
+
 
 
 if __name__ == "__main__":
