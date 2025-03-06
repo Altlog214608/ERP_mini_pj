@@ -162,20 +162,19 @@ class Receiving(tk.Frame):
         self.test_button3 = ttk.Button(self.testframe2, text= "저장")
         self.test_button3.grid(row=3, column=1,pady=5)
         # self.test_button3.place(x=10,y=140)
-
-        self.test_treeview = ttk.Treeview(self.frame3, columns=test_columns,displaycolumns=test_columns)
-        self.test_treeview.grid(row=0, column=0)
-
-        self.test_treeview.column("입고번호", width=1000, anchor="center")
-        self.test_treeview.heading("입고번호", text="입고번호", anchor="center")
-
-        self.scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.test_treeview.xview())
-        self.scrollbar.pack(side="bottom", fill="x")
-        self.test_treeview.configure(xscrollcommand=self.scrollbar.set)
+        #
+        # self.test_treeview = ttk.Treeview(self.frame3, columns=test_columns,displaycolumns=test_columns)
+        # self.test_treeview.grid(row=0, column=0)
+        #
+        # self.test_treeview.column("입고번호", width=1000, anchor="center")
+        # self.test_treeview.heading("입고번호", text="입고번호", anchor="center")
+        #
+        # self.scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.test_treeview.xview())
+        # self.scrollbar.pack(side="bottom", fill="x")
+        # self.test_treeview.configure(xscrollcommand=self.scrollbar.set)
     #
     # def
 
-#
 
 if __name__ == "__main__":
     r = tk.Tk()
