@@ -57,13 +57,13 @@ class Shipping(tk.Frame):
                                 height=350)
         subtable.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        self.tlabel1 = ttk.Label(self.frame2, text="출고 번호")
+        self.tlabel1 = ttk.Label(self.frame2, text="발주 코드")
         self.tentry1 = ttk.Entry(self.frame2)
         self.tlabel2 = ttk.Label(self.frame2, text="거래처 코드")
         self.tentry2 = ttk.Entry(self.frame2)
         self.tlabel3 = ttk.Label(self.frame2, text="자재 코드")
         self.tentry3 = ttk.Entry(self.frame2)
-        self.tlabel4 = ttk.Label(self.frame2, text="발주 코드")
+        self.tlabel4 = ttk.Label(self.frame2, text="출고 번호")
         self.tentry4 = ttk.Entry(self.frame2)
         self.tlabel5 = ttk.Label(self.frame2, text="생산지시서코드")
         self.tentry5 = ttk.Entry(self.frame2)
@@ -95,6 +95,7 @@ class Shipping(tk.Frame):
         self.frame1.grid_rowconfigure(0, weight=1)  # 행이 늘어나면 Treeview도 늘어남
         self.frame1.grid_columnconfigure(0, weight=1)  # 열이 늘어나면 Treeview도 늘어남
 
+
     def makeDB(self):
         self.dbm.query("use sakila")
         self.dbm.query(
@@ -113,10 +114,8 @@ class Shipping(tk.Frame):
 
     def dataDB(self):
         result = self.dbm.query("SELECT * FROM actor")
-        for i in result:
-            print(i)
-        print(list(result))
         return list(result)
+
     def columnDB(self):
         # self.dbm.query("USE test;")
         columnlist = []
