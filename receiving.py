@@ -1,14 +1,22 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
+import dbManager
 
+host = "localhost"
+user = "root"
+password = 0000
+port = 3306
 test_columns = ["입고번호","거래처코드","거래처명","입고 담당자","단가","수량","단위","발주번호","생산지시서 코드","자재명","자재코드"]
 
 
 class Receiving(tk.Frame):
+    dbm = dbManager.DBManager(host,user,password,port)
+
     def __init__(self, root):
         super().__init__(root, width=1300, height=700)
         self.root = root
+
 
         self.frame1 = tk.Frame(self, width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
         self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
@@ -151,7 +159,7 @@ class Receiving(tk.Frame):
         self.test_button.grid(row=0, column=1,pady=5)
         # self.test_button.place(y=5)
 
-        self.test_button2 = ttk.Button(self.testframe2, text= "신규")
+        self.test_button2 = ttk.Button(self.testframe2, text= "입고")
         self.test_button2.grid(row=1, column=1,pady=5)
         # self.test_button2.place(x=10,y=60)
 
@@ -161,6 +169,9 @@ class Receiving(tk.Frame):
 
         self.test_button3 = ttk.Button(self.testframe2, text= "저장")
         self.test_button3.grid(row=3, column=1,pady=5)
+        
+        self.test_button4 = ttk.Button(self.testframe2, text= "수정")
+        self.test_button4.grid(row=4, column=1,pady=5)
         # self.test_button3.place(x=10,y=140)
         #
         # self.test_treeview = ttk.Treeview(self.frame3, columns=test_columns,displaycolumns=test_columns)
