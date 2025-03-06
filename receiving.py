@@ -18,6 +18,7 @@ class Receiving(tk.Frame):
     def __init__(self, root):
         super().__init__(root, width=1300, height=700)
         self.root = root
+        self.name = None
 
         self.frame1 = tk.Frame(self, width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
         self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
@@ -76,36 +77,37 @@ class Receiving(tk.Frame):
 
 
         # 조회 필드 테스트용 엔트리
-        self.tlabel1 = ttk.Label(self.testframe, text="테스트용 라벨")
+        self.tlabel1 = ttk.Label(self.testframe, text="입고 번호")
         self.tentry1 = ttk.Entry(self.testframe)
 
-        self.tlabel2 = ttk.Label(self.testframe, text="테스트용 라벨")
+        self.tlabel2 = ttk.Label(self.testframe, text="거래처 코드")
         self.tentry2 = ttk.Entry(self.testframe)
 
-        self.tlabel3 = ttk.Label(self.testframe, text="테스트용 라벨")
+        self.tlabel3 = ttk.Label(self.testframe, text="자재 코드")
         self.tentry3 = ttk.Entry(self.testframe)
 
-        self.tlabel4 = ttk.Label(self.testframe, text="테스트용 라벨")
+        self.tlabel4 = ttk.Label(self.testframe, text="발주 번호")
         self.tentry4 = ttk.Entry(self.testframe)
 
-        self.tlabel5 = ttk.Label(self.testframe, text="테스트용 라벨")
+        self.tlabel5 = ttk.Label(self.testframe, text="품목명")
         self.tentry5 = ttk.Entry(self.testframe)
 
         #조회 필드 테스트용 엔트리 배치
-        self.tlabel1.grid(row=0, column=0, padx=5, pady=5)
-        self.tentry1.grid(row=0, column=1, padx=5, pady=5)
 
-        self.tlabel2.grid(row=1, column=0, padx=5, pady=5)
-        self.tentry2.grid(row=1, column=1, padx=5, pady=5)
+        self.tlabel1.grid(row=0, column=0, padx=5, pady=20)
+        self.tentry1.grid(row=0, column=1, padx=5, pady=20)
 
-        self.tlabel3.grid(row=2, column=0, padx=5, pady=5)
-        self.tentry3.grid(row=2, column=1, padx=5, pady=5)
+        self.tlabel2.grid(row=1, column=0, padx=5, pady=20)
+        self.tentry2.grid(row=1, column=1, padx=5, pady=20)
 
-        self.tlabel4.grid(row=3, column=0, padx=5, pady=5)
-        self.tentry4.grid(row=3, column=1, padx=5, pady=5)
+        self.tlabel3.grid(row=2, column=0, padx=5, pady=20)
+        self.tentry3.grid(row=2, column=1, padx=5, pady=20)
 
-        self.tlabel5.grid(row=4, column=0, padx=5, pady=5)
-        self.tentry5.grid(row=4, column=1, padx=5, pady=5)
+        self.tlabel4.grid(row=3, column=0, padx=5, pady=20)
+        self.tentry4.grid(row=3, column=1, padx=5, pady=20)
+
+        self.tlabel5.grid(row=4, column=0, padx=5, pady=20)
+        self.tentry5.grid(row=4, column=1, padx=5, pady=20)
 
 
         # CRUD 버튼
@@ -198,7 +200,6 @@ class Receiving(tk.Frame):
                 print(f"{name}컬럼 추가")
         else:
             print("이미 존재하는 컬럼")
-
 
 
 
