@@ -25,8 +25,8 @@ class Receiving(tk.Frame):
         # (frame 3, 4가 하나라면 아래와 같이 사용)
         self.frame3 = tk.Frame(self, width=1300, height=350, bg="white")  # 아래 구역
 
-        self.testframe = tk.Frame(self.frame2,width=250,height=350, bg="lightgrey")
-        self.testframe2 = tk.Frame(self.frame2,width=100,height=350, bg="lightgrey")
+        # self.frame2 = tk.Frame(self.frame2, width=250, height=350, bg="lightgrey")
+        # self.testframe2 = tk.Frame(self.frame2,width=100,height=350, bg="lightgrey")
         # frame 크기 자동 축소 방지 (pack/grid)
         self.frame1.grid_propagate(False)
         self.frame1.pack_propagate(False)
@@ -40,10 +40,10 @@ class Receiving(tk.Frame):
         self.frame2.grid(row=0, column=1)
         self.frame3.grid(row=1, column=0, columnspan=2)
 
-        self.testframe.grid(row=0, column=0)
-        self.testframe.place(x=0,y=0)
-        self.testframe2.grid(row=0, column=1)
-        self.testframe2.place(x=250,y=0)
+        # self.frame2.grid(row=0, column=0)
+        # self.frame2.place(x=0, y=0)
+        # self.testframe2.grid(row=0, column=1)
+        # self.testframe2.place(x=250,y=0)
 
         self.makeDB()
         self.maintable_columns = self.columnDB()
@@ -77,57 +77,42 @@ class Receiving(tk.Frame):
 
 
         # 조회 필드 테스트용 엔트리
-        self.tlabel1 = ttk.Label(self.testframe, text="입고 번호")
-        self.tentry1 = ttk.Entry(self.testframe)
+        self.tlabel1 = ttk.Label(self.frame2, text="입고 번호")
+        self.tentry1 = ttk.Entry(self.frame2)
 
-        self.tlabel2 = ttk.Label(self.testframe, text="거래처 코드")
-        self.tentry2 = ttk.Entry(self.testframe)
+        self.tlabel2 = ttk.Label(self.frame2, text="거래처 코드")
+        self.tentry2 = ttk.Entry(self.frame2)
 
-        self.tlabel3 = ttk.Label(self.testframe, text="자재 코드")
-        self.tentry3 = ttk.Entry(self.testframe)
+        self.tlabel3 = ttk.Label(self.frame2, text="자재 코드")
+        self.tentry3 = ttk.Entry(self.frame2)
 
-        self.tlabel4 = ttk.Label(self.testframe, text="발주 번호")
-        self.tentry4 = ttk.Entry(self.testframe)
+        self.tlabel4 = ttk.Label(self.frame2, text="발주 번호")
+        self.tentry4 = ttk.Entry(self.frame2)
 
-        self.tlabel5 = ttk.Label(self.testframe, text="품목명")
-        self.tentry5 = ttk.Entry(self.testframe)
+        self.tlabel5 = ttk.Label(self.frame2, text="품목명")
+        self.tentry5 = ttk.Entry(self.frame2)
 
-        #조회 필드 테스트용 엔트리 배치
+        self.tlabel1.grid(row=0, column=0, padx=5, pady=10)
+        self.tentry1.grid(row=0, column=1, padx=5, pady=10)
+        self.tlabel2.grid(row=1, column=0, padx=5, pady=10)
+        self.tentry2.grid(row=1, column=1, padx=5, pady=10)
+        self.tlabel3.grid(row=2, column=0, padx=5, pady=10)
+        self.tentry3.grid(row=2, column=1, padx=5, pady=10)
+        self.tlabel4.grid(row=3, column=0, padx=5, pady=10)
+        self.tentry4.grid(row=3, column=1, padx=5, pady=10)
+        self.tlabel5.grid(row=4, column=0, padx=5, pady=10)
+        self.tentry5.grid(row=4, column=1, padx=5, pady=10)
 
-        self.tlabel1.grid(row=0, column=0, padx=5, pady=20)
-        self.tentry1.grid(row=0, column=1, padx=5, pady=20)
-
-        self.tlabel2.grid(row=1, column=0, padx=5, pady=20)
-        self.tentry2.grid(row=1, column=1, padx=5, pady=20)
-
-        self.tlabel3.grid(row=2, column=0, padx=5, pady=20)
-        self.tentry3.grid(row=2, column=1, padx=5, pady=20)
-
-        self.tlabel4.grid(row=3, column=0, padx=5, pady=20)
-        self.tentry4.grid(row=3, column=1, padx=5, pady=20)
-
-        self.tlabel5.grid(row=4, column=0, padx=5, pady=20)
-        self.tentry5.grid(row=4, column=1, padx=5, pady=20)
-
-
-        # CRUD 버튼
-        self.test_button = ttk.Button(self.testframe2, text= "조회", command=self.check_data)
-        self.test_button.grid(row=0, column=1,pady=5)
-        # self.test_button.place(y=5)
-
-        self.test_button2 = ttk.Button(self.testframe2, text= "입고")
-        self.test_button2.grid(row=1, column=1,pady=5)
-        # self.test_button2.place(x=10,y=60)
-
-        self.test_button3 = ttk.Button(self.testframe2, text= "생성")
-        self.test_button3.grid(row=2, column=1,pady=5)
-        # self.test_button3.place(x=10,y=100)
-
-        self.test_button3 = ttk.Button(self.testframe2, text= "저장")
-        self.test_button3.grid(row=3, column=1,pady=5)
-        
-        self.test_button4 = ttk.Button(self.testframe2, text= "수정")
-        self.test_button4.grid(row=4, column=1,pady=5)
+        self.test_button = ttk.Button(self.frame2, text="조회", command=self.check_data)
+        self.test_button.grid(row=0, column=2, pady=5)
+        self.test_button2 = ttk.Button(self.frame2, text="입고")
+        self.test_button2.grid(row=1, column=2, pady=5)
+        self.test_button3 = ttk.Button(self.frame2, text="생성")
+        self.test_button3.grid(row=2, column=2, pady=5)
+        self.test_button3 = ttk.Button(self.frame2, text="저장")
+        self.test_button3.grid(row=3, column=2, pady=5)
+        self.test_button4 = ttk.Button(self.frame2, text="수정")
+        self.test_button4.grid(row=4, column=2, pady=5)
 
 
     def check_data(self): #데이터 조회 버튼
