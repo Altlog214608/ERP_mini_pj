@@ -110,23 +110,29 @@ class Shipping(tk.Frame):
         self.test_button4.grid(row=4, column=2,pady=5)
 
     def check_data(self): #데이터 조회 버튼
-        # self.main_table.draw_table()
-        # target = self.tentry1.get()
-        # self.tentry1.delete(0, tk.END)
-        # self.main_datalist = self.dbm.query(f"SELECT * FROM shipping where purchase_order_code = '{target}'")
-        # self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
-        # self.main_table_columns = self.get_columns("shipping")
-        # self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
-        # self.main_table.draw_table()
-
-        self.sub_table.draw_table()
-        target = self.tentry1.get()
-        self.tentry1.delete(0, tk.END)
-        self.sub_datalist = self.dbm.query(f"SELECT * FROM purchase_orders where purchase_order_code = '{target}'")
-        self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
-        self.sub_table_columns = self.get_columns("purchase_orders")
-        self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
-        self.sub_table.draw_table()
+        if self.tentry1.get():
+            self.sub_table.draw_table()
+            target = self.tentry1.get()
+            self.tentry1.delete(0, tk.END)
+            self.sub_datalist = self.dbm.query(f"SELECT * FROM purchase_orders where purchase_order_code = '{target}'")
+            self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
+            self.sub_table_columns = self.get_columns("purchase_orders")
+            self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,
+                                     col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
+            self.sub_table.draw_table()
+            print(self.dbm.query(f"SELECT * FROM shipping where client_code = 'cl001'"))
+        # if self.tentry2.get():
+        #     # self.main_table.draw_table()
+        #     target = self.tentry2.get()
+        #     self.tentry2.delete(0, tk.END)
+        #     self.main_datalist = self.dbm.query(f"SELECT * FROM shipping where client_code = '{target}'")
+        #     print(self.main_datalist)
+        #     self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
+        #     self.main_table_columns = self.get_columns("shipping")
+        #     self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
+        #     self.main_table.draw_table()
+        else:
+            print("선택값 없음")
 
     def make_table(self):
         self.dbm.query("use sakila")
