@@ -345,7 +345,7 @@ if __name__ == "__main__":
     # 사용 예시
     root = tk.Tk() # 부모 창
     root.config(bg="black")
-    test_data = [[f"Data {r + 1}{chr(65 + c)}" for c in range(4)] for r in range(15)] # 임의의 데이터
+    test_data = [[f"Data {r + 1}{chr(65 + c)}" for c in range(4)] for r in range(5)] # 임의의 데이터
 
     app1 = TableWidget(root, 
                        data=test_data,

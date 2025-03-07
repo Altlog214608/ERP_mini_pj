@@ -35,34 +35,46 @@ class Shipping(tk.Frame):
         self.frame2.grid(row=0, column=1)
         self.frame3.grid(row=1, column=0, columnspan=2)
 
-        self.makeTB() #table생성
-        self.maintable_columns = self.columnDB("actor") #테이블 이름에 맞는 컬럼명 추출
-        self.subtable_columns = self.columnDB("address")
-        self.maindatalist = self.dataDB("actor") #테이블 이름에 맞는 데이터 추출
-        self.subdatalist = self.dataDB("address")
-        print(self.maintable_columns)
-        self.maindata = []
-        self.subdata = []
+        self.make_table() #table생성
+        self.main_table_columns = self.get_columns("shipping") #테이블 이름에 맞는 컬럼명 추출
+        self.sub_table_columns = self.get_columns("purchase_orders")
+        self.main_datalist = self.get_all_data("shipping") #테이블 이름에 맞는 데이터 추출
+        self.sub_datalist = self.get_all_data("purchase_orders")
+        print(self.main_table_columns)
+        self.main_data = []
+        self.sub_data = []
         # 메인 데이터 담기
-        self.maindata = [[f"{c}" for c in self.maindatalist[r]] for r in range(len(self.maindatalist))]
-        #메인 프레임
-        self.maintable = TableWidget(self.frame3,
-                           data=self.maindata,
-                           col_name=self.maintable_columns,
-                           col_width=[500 for _ in range(len(self.maintable_columns))],  # 열 너비(순서대로, 데이터 열 개수와 맞게)
-                           width=1300,
-                           height=350)
-        self.maintable.grid(row=0, column=0, columnspan=2, sticky="nsew")
-        # 서브 데이터 담기
-        self.subdata = [[f"{c}" for c in self.subdatalist[r]] for r in range(len(self.subdatalist))]
-        # 서브 프레임
-        self.subtable = TableWidget(self.frame1,
-                                data=self.subdata,
-                                col_name=self.subtable_columns,
-                                width=950,
-                                height=350)
-        self.subtable.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
 
+        #메인 프레임
+        self.main_table = TableWidget(self.frame3,
+                                      data=self.main_data,
+                                      col_name=self.main_table_columns,
+                                      col_width=[130 for _ in range(len(self.main_table_columns))],  # 열 너비(순서대로, 데이터 열 개수와 맞게)
+                                      width=1300,
+                                      height=350)
+        self.main_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+        self.main_scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.main_table.canvas.xview)
+        self.main_scrollbar.pack(side="bottom",fill="x")
+        self.main_table.canvas.configure(xscrollcommand=self.main_scrollbar.set)
+
+        # 서브 데이터 담기
+        # self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
+        # self.sub_data = [[f"" for c in range(len(self.sub_table_columns))] for r in range(len(self.sub_datalist))]
+        self.sub_data = [[f"" for c in range(len(self.sub_table_columns))] for r in range(1)]
+        # 서브 프레임
+        self.sub_table = TableWidget(self.frame1,
+                                     data=self.sub_data,
+                                     col_name=self.sub_table_columns,
+                                     col_width=[130 for _ in range(len(self.sub_table_columns))],
+                                     width=950,
+                                     height=350)
+        self.sub_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
+
+        self.sub_scrollbar = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.sub_table.canvas.xview)
+        self.sub_scrollbar.pack(side="bottom", fill="x")
+        self.sub_table.canvas.configure(xscrollcommand=self.sub_scrollbar.set)
         #조회 필드 위젯
         self.tlabel1 = ttk.Label(self.frame2, text="발주 코드")
         self.tentry1 = ttk.Entry(self.frame2)
@@ -98,16 +110,25 @@ class Shipping(tk.Frame):
         self.test_button4.grid(row=4, column=2,pady=5)
 
     def check_data(self): #데이터 조회 버튼
-        print(self.tentry1.get())
-        self.tentry1.delete(0, tk.END)
-        # self.maintable.config(maindata=)
-        self.maindatalist = self.dbm.query("SELECT * FROM actor where first_name = 'BURT'")
-        self.maindata = [[f"{c}" for c in self.maindatalist[r]] for r in range(len(self.maindatalist))]
-        self.maintable_columns = self.columnDB("actor")
-        self.maintable.from_data(data=self.maindata, col_name=self.maintable_columns)  # 데이터 갱신
-        self.maintable.draw_table()
+        # self.main_table.draw_table()
+        # target = self.tentry1.get()
+        # self.tentry1.delete(0, tk.END)
+        # self.main_datalist = self.dbm.query(f"SELECT * FROM shipping where purchase_order_code = '{target}'")
+        # self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
+        # self.main_table_columns = self.get_columns("shipping")
+        # self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
+        # self.main_table.draw_table()
 
-    def makeTB(self):
+        self.sub_table.draw_table()
+        target = self.tentry1.get()
+        self.tentry1.delete(0, tk.END)
+        self.sub_datalist = self.dbm.query(f"SELECT * FROM purchase_orders where purchase_order_code = '{target}'")
+        self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
+        self.sub_table_columns = self.get_columns("purchase_orders")
+        self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
+        self.sub_table.draw_table()
+
+    def make_table(self):
         self.dbm.query("use sakila")
         self.dbm.query(
             """
@@ -123,16 +144,18 @@ class Shipping(tk.Frame):
         self.add_column(tableName="testshipping",type="char",size=50,name="material_name",null="NOT")
         print("생성됨")
 
-    def dataDB(self,tablename):
+    def get_all_data(self, tablename):
         result = self.dbm.query(f"SELECT * FROM {tablename}")
         return list(result)
 
-    def columnDB(self,tablename):
+    def get_columns(self, tablename):
         # self.dbm.query("USE test;")
         columnlist = []
-        result = self.dbm.query(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'sakila' AND TABLE_NAME  = '{tablename}';")
+        result = self.dbm.query(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'sakila' AND TABLE_NAME  = '{tablename}' ORDER BY ORDINAL_POSITION;")
+        print(result)
         for i in result:
             columnlist.append(i[0])
+        # columnlist.sort()
         return columnlist
 
     def add_column(self, tableName, name, type, size, null=None):
@@ -158,10 +181,10 @@ class Shipping(tk.Frame):
             print("이미 존재하는 컬럼")
 
     def test(self):
-        print(f"data: {self.maintable.data}")  # 저장된 데이터
-        print(f"rows cols: {self.maintable.rows} {self.maintable.cols}")  # 행 열 개수
-        print(f"selected: {self.maintable.selected_row} {self.maintable.selected_col}")  # 선택된 행 열 index
-        print(f"changed {self.maintable.changed}")  # 원본 대비 변경된 데이터
+        print(f"data: {self.main_table.data}")  # 저장된 데이터
+        print(f"rows cols: {self.main_table.rows} {self.main_table.cols}")  # 행 열 개수
+        print(f"selected: {self.main_table.selected_row} {self.main_table.selected_col}")  # 선택된 행 열 index
+        print(f"changed {self.main_table.changed}")  # 원본 대비 변경된 데이터
 
 if __name__ == "__main__":
     r = tk.Tk()
