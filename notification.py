@@ -39,7 +39,7 @@ class Notification(tk.Frame):
         self.name_label.place(x=5,y=5)
 
         self.mesagge_label = tk.Label(self.ui_frame, text=message)
-        self.mesagge_label.place(x=5,y=35)
+        self.mesagge_label.place(x=5,y=38)
         # self.label = tk.Label(self, text=message, bg=Color.FOCUS, fg="white")
         # self.label.grid(row=1,column=1,)
 
