@@ -35,28 +35,35 @@ class Shipping(tk.Frame):
         self.frame2.grid(row=0, column=1)
         self.frame3.grid(row=1, column=0, columnspan=2)
 
-        self.makeDB()
-        self.maintable_columns = self.columnDB()
-        self.datalist = self.dataDB()
+        self.makeTB() #table생성
+        self.maintable_columns = self.columnDB("actor") #테이블 이름에 맞는 컬럼명 추출
+        self.subtable_columns = self.columnDB("address")
+        self.maindatalist = self.dataDB("actor") #테이블 이름에 맞는 데이터 추출
+        self.subdatalist = self.dataDB("address")
         print(self.maintable_columns)
-
-        # test_data = [[f"Data {r + 1}{chr(65 + c)}" for c in range(len(self.maintable_columns))] for r in range(15)]
-        test_data = [[f"{c}" for c in self.datalist[r]] for r in range(len(self.datalist))]
-
-        maintable = TableWidget(self.frame3,
-                           data=test_data,
+        self.maindata = []
+        self.subdata = []
+        # 메인 데이터 담기
+        self.maindata = [[f"{c}" for c in self.maindatalist[r]] for r in range(len(self.maindatalist))]
+        #메인 프레임
+        self.maintable = TableWidget(self.frame3,
+                           data=self.maindata,
                            col_name=self.maintable_columns,
+                           col_width=[500 for _ in range(len(self.maintable_columns))],  # 열 너비(순서대로, 데이터 열 개수와 맞게)
                            width=1300,
                            height=350)
-        maintable.grid(row=0, column=0, columnspan=2, sticky="nsew")
-
-        subtable = TableWidget(self.frame1,
-                                data=test_data,
-                                col_name=self.maintable_columns,
+        self.maintable.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        # 서브 데이터 담기
+        self.subdata = [[f"{c}" for c in self.subdatalist[r]] for r in range(len(self.subdatalist))]
+        # 서브 프레임
+        self.subtable = TableWidget(self.frame1,
+                                data=self.subdata,
+                                col_name=self.subtable_columns,
                                 width=950,
                                 height=350)
-        subtable.grid(row=0, column=0, columnspan=2, sticky="nsew")
+        self.subtable.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
+        #조회 필드 위젯
         self.tlabel1 = ttk.Label(self.frame2, text="발주 코드")
         self.tentry1 = ttk.Entry(self.frame2)
         self.tlabel2 = ttk.Label(self.frame2, text="거래처 코드")
@@ -91,12 +98,16 @@ class Shipping(tk.Frame):
         self.test_button4.grid(row=4, column=2,pady=5)
 
     def check_data(self): #데이터 조회 버튼
-        # frame1 내부에서 row/column 크기 조정 가능하도록 설정
-        self.frame1.grid_rowconfigure(0, weight=1)  # 행이 늘어나면 Treeview도 늘어남
-        self.frame1.grid_columnconfigure(0, weight=1)  # 열이 늘어나면 Treeview도 늘어남
+        print(self.tentry1.get())
+        self.tentry1.delete(0, tk.END)
+        # self.maintable.config(maindata=)
+        self.maindatalist = self.dbm.query("SELECT * FROM actor where first_name = 'BURT'")
+        self.maindata = [[f"{c}" for c in self.maindatalist[r]] for r in range(len(self.maindatalist))]
+        self.maintable_columns = self.columnDB("actor")
+        self.maintable.from_data(data=self.maindata, col_name=self.maintable_columns)  # 데이터 갱신
+        self.maintable.draw_table()
 
-
-    def makeDB(self):
+    def makeTB(self):
         self.dbm.query("use sakila")
         self.dbm.query(
             """
@@ -112,14 +123,14 @@ class Shipping(tk.Frame):
         self.add_column(tableName="testshipping",type="char",size=50,name="material_name",null="NOT")
         print("생성됨")
 
-    def dataDB(self):
-        result = self.dbm.query("SELECT * FROM actor")
+    def dataDB(self,tablename):
+        result = self.dbm.query(f"SELECT * FROM {tablename}")
         return list(result)
 
-    def columnDB(self):
+    def columnDB(self,tablename):
         # self.dbm.query("USE test;")
         columnlist = []
-        result = self.dbm.query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'sakila' AND TABLE_NAME  = 'actor';")
+        result = self.dbm.query(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'sakila' AND TABLE_NAME  = '{tablename}';")
         for i in result:
             columnlist.append(i[0])
         return columnlist
@@ -146,11 +157,19 @@ class Shipping(tk.Frame):
         else:
             print("이미 존재하는 컬럼")
 
+    def test(self):
+        print(f"data: {self.maintable.data}")  # 저장된 데이터
+        print(f"rows cols: {self.maintable.rows} {self.maintable.cols}")  # 행 열 개수
+        print(f"selected: {self.maintable.selected_row} {self.maintable.selected_col}")  # 선택된 행 열 index
+        print(f"changed {self.maintable.changed}")  # 원본 대비 변경된 데이터
+
 if __name__ == "__main__":
     r = tk.Tk()
     r.geometry("1300x700")
     r.config(bg="white")
     fr = Shipping(r)
     fr.place(x=0, y=0)
+
+    r.bind("<F5>", lambda e: Shipping.test(fr))
 
     r.mainloop()

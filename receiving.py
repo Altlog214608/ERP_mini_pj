@@ -18,7 +18,6 @@ class Receiving(tk.Frame):
     def __init__(self, root):
         super().__init__(root, width=1300, height=700)
         self.root = root
-        self.name = None
 
         self.frame1 = tk.Frame(self, width=950, height=350, bg=Color.GRAY)  # 왼쪽 위 구역
         self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg=Color.GRAY)  # 오른쪽 위 구역
@@ -49,10 +48,13 @@ class Receiving(tk.Frame):
         self.maintable_columns = self.columnDB()
         print(self.maintable_columns)
 
-        test_data = [[f"Data {r + 1}{chr(65 + c)}" for c in range(6)] for r in range(15)]  # 임의의 데이터
+        self.maindata = []
+        self.subdata = []
+
+        self.maindata = [[f"Data {r + 1}{chr(65 + c)}" for c in range(6)] for r in range(15)]  # 임의의 데이터
 
         maintable = TableWidget(self.frame3,
-                           data=test_data,
+                           data=self.maindata,
                            col_name=self.maintable_columns,  # 열 이름(순서대로, 데이터 열 개수와 맞게)
                            # col_width=[325, 325, 325, 325],  # 열 너비(순서대로, 데이터 열 개수와 맞게)
                            width=1300,  # 테이블 그려질 너비
@@ -62,10 +64,10 @@ class Receiving(tk.Frame):
 
         maintable.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-        test_data = [[f"Data {r + 1}{chr(65 + c)}" for c in range(6)] for r in range(15)]  # 임의의 데이터
+        self.subdata = [[f"" for _ in range(6)] for _ in range(15)]  # 임의의 데이터
 
         subtable = TableWidget(self.frame1,
-                                data=test_data,
+                                data=self.subdata,
                                 col_name=self.maintable_columns,  # 열 이름(순서대로, 데이터 열 개수와 맞게)
                                 # col_width=[325, 325, 325, 325],  # 열 너비(순서대로, 데이터 열 개수와 맞게)
                                 width=950,  # 테이블 그려질 너비
@@ -116,26 +118,8 @@ class Receiving(tk.Frame):
 
 
     def check_data(self): #데이터 조회 버튼
-        # frame1 내부에서 row/column 크기 조정 가능하도록 설정
-        self.frame1.grid_rowconfigure(0, weight=1)  # 행이 늘어나면 Treeview도 늘어남
-        self.frame1.grid_columnconfigure(0, weight=1)  # 열이 늘어나면 Treeview도 늘어남
-
-        self.test_treeview = ttk.Treeview(self.frame1, columns=test_columns, displaycolumns=test_columns)
-        self.test_treeview.grid(row=0, column=0, pady=5, sticky="nsew")
-
-        for i in test_columns:
-            self.test_treeview.column(i, width=100, anchor="center")
-            self.test_treeview.heading(i, text=i, anchor="center")
-
-        self.scrollbar_y = ttk.Scrollbar(self.frame1, orient="vertical", command=self.test_treeview.yview)
-        self.scrollbar_y.grid(row=0, column=1, sticky="ns")
-        self.test_treeview.configure(yscrollcommand=self.scrollbar_y.set)
-
-        self.scrollbar_x = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.test_treeview.xview)
-        self.scrollbar_x.grid(row=1, column=0, sticky="ew")
-        self.test_treeview.configure(xscrollcommand=self.scrollbar_x.set)
-
-        self.test_treeview["show"] = "headings"
+        print(self.tentry1.get())
+        self.tentry1.delete(0,tk.END)
 
     def makeDB(self):
         self.dbm.query("use test")
