@@ -20,10 +20,10 @@ class Receiving(tk.Frame):
         self.root = root
         self.name = None
 
-        self.frame1 = tk.Frame(self, width=950, height=350, bg="lightgrey")  # 왼쪽 위 구역
-        self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg="lightgrey")  # 오른쪽 위 구역
+        self.frame1 = tk.Frame(self, width=950, height=350, bg=Color.GRAY)  # 왼쪽 위 구역
+        self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg=Color.GRAY)  # 오른쪽 위 구역
         # (frame 3, 4가 하나라면 아래와 같이 사용)
-        self.frame3 = tk.Frame(self, width=1300, height=350, bg="white")  # 아래 구역
+        self.frame3 = tk.Frame(self, width=1300, height=350, bg=Color.WHITE)  # 아래 구역
 
         # self.frame2 = tk.Frame(self.frame2, width=250, height=350, bg="lightgrey")
         # self.testframe2 = tk.Frame(self.frame2,width=100,height=350, bg="lightgrey")
