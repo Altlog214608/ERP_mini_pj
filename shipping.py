@@ -121,6 +121,7 @@ class Shipping(tk.Frame):
                                      col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
             self.sub_table.draw_table()
             print(self.dbm.query(f"SELECT * FROM shipping where client_code = 'cl001'"))
+            self.dbm.close()
         # if self.tentry2.get():
         #     # self.main_table.draw_table()
         #     target = self.tentry2.get()
