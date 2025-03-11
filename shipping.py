@@ -313,8 +313,27 @@ class Shipping(tk.Frame):
             print("이미 존재하는 컬럼")
 
     def shipping_process(self):
-        print(self.check_main_data())
-        print(self.check_sub_data())
+        a = self.dbm.query(f"""
+                SELECT 
+                o.order_code,        -- 발주 코드
+                o.order_id,          -- order_id
+                m.mo_code,           -- 생산지시서 코드
+                s.shipping_code,       -- 출고 번호
+                s.quantity,          -- 수량
+                t.material_Code,     -- 자재 코드
+                t.material_Name,     -- 자재 명
+                t.unit,              -- 단위
+                t.price,             -- 가격
+                CURDATE() AS order_date  -- 오늘 날짜
+                FROM order_form o
+                LEFT JOIN mo m ON o.order_code = m.order_code        -- 생산지시서 조인
+                LEFT JOIN shipping s ON o.order_code = s.order_code  -- 출고 정보 조인
+                LEFT JOIN materialTable t ON s.material_Code = t.material_Code  -- 자재 정보 조인
+                WHERE o.order_code = 'ord003';  -- 특정 발주 코드 조회
+        """)
+        print(a)
+        # print(self.check_main_data())
+        # print(self.check_sub_data())
 
     def check_main_data(self):
         print(f"data: {self.main_table.data}")  # 저장된 데이터
