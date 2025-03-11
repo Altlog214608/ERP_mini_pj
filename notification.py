@@ -2,8 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from color import Color
 
-
-
+testplag = True
 
 
 class NotificationFrame(tk.Frame):
@@ -62,15 +61,20 @@ def openframe():
     nt.deployment()
     nt.place(x=0, y=0)
 
+
 def testdata():
     nt.add_notification("87987", "이윤서")
     nt.add_notification("523987", "송기윤")
+
+def hideframe():
+    nt.place_forget()
 
 if __name__ == "__main__":
     r = tk.Tk()
     r.geometry("1300x700")
     r.config(bg="white")
     nt = NotificationFrame(r)
+
     # nt = NotificationFrame(r)
     # nt.add_notification("123123","김동현")
     # nt.add_notification("456456","성진하")
@@ -85,6 +89,8 @@ if __name__ == "__main__":
     test_button2.pack()
     test_button3 = tk.Button(r,text="새로고침",command=nt.deployment)
     test_button3.pack()
+    test_button4 = tk.Button(r,text="숨기기",command=hideframe)
+    test_button4.pack()
 
     r.mainloop()
 
