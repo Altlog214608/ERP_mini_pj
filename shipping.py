@@ -144,7 +144,7 @@ class Shipping(tk.Frame):
 
         self.test_button = ttk.Button(self.frame2, text= "조회", command=self.check_data)
         self.test_button.grid(row=0, column=2,pady=5)
-        self.test_button2 = ttk.Button(self.frame2, text= "출고")
+        self.test_button2 = ttk.Button(self.frame2, text= "출고", command=self.shipping_process)
         self.test_button2.grid(row=1, column=2,pady=5)
         self.test_button3 = ttk.Button(self.frame2, text= "생성")
         self.test_button3.grid(row=2, column=2,pady=5)
@@ -312,12 +312,21 @@ class Shipping(tk.Frame):
         else:
             print("이미 존재하는 컬럼")
 
+    def shipping_process(self):
+        print(self.check_main_data())
+        print(self.check_sub_data())
 
-    def test(self):
+    def check_main_data(self):
         print(f"data: {self.main_table.data}")  # 저장된 데이터
         print(f"rows cols: {self.main_table.rows} {self.main_table.cols}")  # 행 열 개수
         print(f"selected: {self.main_table.selected_row} {self.main_table.selected_col}")  # 선택된 행 열 index
-        print(f"changed {self.main_table.changed}")  # 원본 대비 변경된 데이터
+        print(f"changed {self.main_table.changed}")
+
+    def check_sub_data(self):
+        print(f"data: {self.sub_table.data}")  # 저장된 데이터
+        print(f"rows cols: {self.sub_table.rows} {self.sub_table.cols}")  # 행 열 개수
+        print(f"selected: {self.sub_table.selected_row} {self.sub_table.selected_col}")  # 선택된 행 열 index
+        print(f"changed {self.sub_table.changed}")  # 원본 대비 변경된 데이터
 
 def f20701(**kwargs):
     result_dict = {}
@@ -343,6 +352,7 @@ if __name__ == "__main__":
     fr = Shipping(r)
     fr.place(x=0, y=0)
 
-    r.bind("<F5>", lambda e: Shipping.test(fr))
+    r.bind("<F5>", lambda e: Shipping.check_main_data(fr))
+    r.bind("<F6>", lambda e: Shipping.check_sub_data(fr))
 
     r.mainloop()
