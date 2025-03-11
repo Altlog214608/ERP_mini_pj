@@ -28,6 +28,10 @@ class NotificationFrame(tk.Frame):
         for i, item in enumerate(self.nt_list):
             item.grid(row=i,column=0)
 
+    def hideframe(self):
+        nt.place_forget()
+
+
 
 class Notification(tk.Frame):
     def __init__(self, root, message, userID):
@@ -83,6 +87,7 @@ if __name__ == "__main__":
     # nt.add_notification("445566","최정윤")
     # nt.add_notification("778899","김태연")
     # nt.place(x=0, y=0)
+
     test_button = tk.Button(r,text="테스트",command=openframe)
     test_button.pack()
     test_button2 = tk.Button(r,text="데이터추가",command=testdata)
