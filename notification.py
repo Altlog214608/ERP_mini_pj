@@ -2,6 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 from color import Color
 
+
+
+
+
 class NotificationFrame(tk.Frame):
     def __init__(self,root):
         super().__init__(root, width=350, height=350)
@@ -19,7 +23,7 @@ class NotificationFrame(tk.Frame):
         new_nt = Notification(self.mainframe, message, userID)
         self.nt_list.append(new_nt)
 
-        self.deployment()
+        # self.deployment()
 
     def deployment(self):
         for i, item in enumerate(self.nt_list):
@@ -48,17 +52,39 @@ class Notification(tk.Frame):
     def testfc(self,e):
         print("frame click")
 
-if __name__ == "__main__":
-    r = tk.Tk()
-    r.geometry("1300x700")
-    r.config(bg="white")
-    nt = NotificationFrame(r)
+def openframe():
     nt.add_notification("123123","김동현")
     nt.add_notification("456456","성진하")
     nt.add_notification("789789","박민환")
     nt.add_notification("112233","양승준")
     nt.add_notification("445566","최정윤")
     nt.add_notification("778899","김태연")
+    nt.deployment()
     nt.place(x=0, y=0)
 
+def testdata():
+    nt.add_notification("87987", "이윤서")
+    nt.add_notification("523987", "송기윤")
+
+if __name__ == "__main__":
+    r = tk.Tk()
+    r.geometry("1300x700")
+    r.config(bg="white")
+    nt = NotificationFrame(r)
+    # nt = NotificationFrame(r)
+    # nt.add_notification("123123","김동현")
+    # nt.add_notification("456456","성진하")
+    # nt.add_notification("789789","박민환")
+    # nt.add_notification("112233","양승준")
+    # nt.add_notification("445566","최정윤")
+    # nt.add_notification("778899","김태연")
+    # nt.place(x=0, y=0)
+    test_button = tk.Button(r,text="테스트",command=openframe)
+    test_button.pack()
+    test_button2 = tk.Button(r,text="데이터추가",command=testdata)
+    test_button2.pack()
+    test_button3 = tk.Button(r,text="새로고침",command=nt.deployment)
+    test_button3.pack()
+
     r.mainloop()
+
