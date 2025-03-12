@@ -48,7 +48,7 @@ receiving_columns = {
     "입고 구분": "receiving_classification"
 }
 
-dbm = dbManager.DBManager(host,user,password,port)
+# dbm = dbManager.DBManager(host,user,password,port)
 
 class Shipping(tk.Frame):
     dbm = dbManager.DBManager(host,user,password,port)
@@ -79,11 +79,12 @@ class Shipping(tk.Frame):
         # for i in shipping_columns.keys():
         #     test.append(i)
         # self.main_table_columns = test
-        self.sub_table_columns = self.get_columns("order_form")
+        self.sub_table_columns = self.get_columns("mo")
         self.main_datalist = self.get_all_data("shipping") #테이블 이름에 맞는 데이터 추출
-        self.sub_datalist = self.get_all_data("order_form")
+        self.sub_datalist = self.get_all_data("mo")
         self.main_data = []
         self.sub_data = []
+        self.save_list = []
         # 메인 데이터 담기
         self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
         #메인 프레임
@@ -112,7 +113,6 @@ class Shipping(tk.Frame):
 
         self.sub_scrollbar = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.sub_table.canvas.xview)
         self.sub_scrollbar.pack(side="bottom", fill="x")
-
         self.sub_table.canvas.configure(xscrollcommand=self.sub_scrollbar.set)
         #조회 필드 위젯
 
@@ -148,7 +148,7 @@ class Shipping(tk.Frame):
         self.test_button2.grid(row=1, column=2,pady=5)
         self.test_button3 = ttk.Button(self.frame2, text= "생성")
         self.test_button3.grid(row=2, column=2,pady=5)
-        self.test_button3 = ttk.Button(self.frame2, text= "저장")
+        self.test_button3 = ttk.Button(self.frame2, text= "저장", command=self.save_to_db)
         self.test_button3.grid(row=3, column=2,pady=5)
         self.test_button4 = ttk.Button(self.frame2, text= "수정")
         self.test_button4.grid(row=4, column=2,pady=5)
@@ -186,21 +186,17 @@ class Shipping(tk.Frame):
         fr.place(x=500, y=300)
 
     def check_data(self): #데이터 조회 버튼
-        text_list = []
-
         if self.tentry1.get() or self.tentry2.get() or self.tentry3.get() or self.tentry4.get() or self.tentry5.get():
             if self.tentry1.get():
                 self.sub_table.draw_table()
                 target = self.tentry1.get()
                 self.tentry1.delete(0, tk.END)
                 send_dict = {"order_code":target}
-                recv_dict = f20701(dict=send_dict)
+                recv_dict = Shipping.f20701(code=20701,dict=send_dict)
                 key, value = recv_dict.items()
-                print(key)
-                print(value)
                 self.sub_datalist = value[1]
                 self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
-                self.sub_table_columns = self.get_columns("order_form")
+                self.sub_table_columns = self.get_columns("mo")
                 self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,
                                          col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
                 self.sub_table.draw_table()
@@ -210,9 +206,8 @@ class Shipping(tk.Frame):
                 target = self.tentry2.get()
                 self.tentry2.delete(0, tk.END)
                 send_dict = {self.tentry2.cget("textvariable"): target}
-                recv_dict = f20701(dict=send_dict)
+                recv_dict = Shipping.f20701(code=20701,dict=send_dict)
                 key, value = recv_dict.items()
-                # self.main_datalist = self.dbm.query(f"SELECT * FROM shipping where client_code = '{target}'")
                 self.main_datalist = value[1]
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
                 self.main_table_columns = self.get_columns("shipping")
@@ -224,10 +219,9 @@ class Shipping(tk.Frame):
                 target = self.tentry3.get()
                 self.tentry3.delete(0, tk.END)
                 send_dict = {self.tentry3.cget("textvariable"): target}
-                recv_dict = f20701(dict=send_dict)
+                recv_dict = Shipping.f20701(code=20701,dict=send_dict)
                 key, value = recv_dict.items()
                 self.main_datalist = value[1]
-                # self.main_datalist = self.dbm.query(f"SELECT * FROM shipping where material_code = '{target}'")
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
                 self.main_table_columns = self.get_columns("shipping")
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,col_width=[130 for _ in range(len(self.main_table_columns))])
@@ -238,7 +232,7 @@ class Shipping(tk.Frame):
                 target = self.tentry4.get()
                 self.tentry4.delete(0, tk.END)
                 send_dict = {self.tentry4.cget("textvariable"): target}
-                recv_dict = f20701(dict=send_dict)
+                recv_dict = Shipping.f20701(code=20701,dict=send_dict)
                 key, value = recv_dict.items()
                 self.main_datalist = value[1]
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
@@ -251,15 +245,24 @@ class Shipping(tk.Frame):
                 target = self.tentry5.get()
                 self.tentry5.delete(0, tk.END)
                 send_dict = {self.tentry5.cget("textvariable"): target}
-                recv_dict = f20701(dict=send_dict)
+                recv_dict = Shipping.f20701(code=20701,dict=send_dict)
                 key, value = recv_dict.items()
                 self.main_datalist = value[1]
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
                 self.main_table_columns = self.get_columns("shipping")
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,col_width=[130 for _ in range(len(self.main_table_columns))])
                 self.main_table.draw_table()
-            else:
-                print("선택값 없음")
+        else:
+            send_dict = {"0": 0}
+            recv_dict = Shipping.f20701(code=20701,dict=send_dict)
+            key, value = recv_dict.items()
+            self.main_datalist = value[1]
+            self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
+            self.main_table_columns = self.get_columns("shipping")
+            self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
+                                      col_width=[130 for _ in range(len(self.main_table_columns))])
+            self.main_table.draw_table()
+            print("선택값 없음")
 
     def make_table(self):
         self.dbm.query("use test")
@@ -312,28 +315,49 @@ class Shipping(tk.Frame):
         else:
             print("이미 존재하는 컬럼")
 
+    def reorder_columns(self, original_data):
+        # 컬럼명 리스트 가져오기
+        sub_columns = self.get_columns("mo")  # mo 테이블 컬럼명
+        main_columns = self.main_table_columns  # shipping 테이블 컬럼명
+
+        # 컬럼 매핑 (mo -> shipping) 정의
+        column_mapping = {
+            "order_code": "order_code",
+            "quantity": "quantity",
+            "unit": "unit",
+            "material_code":"material_code",
+            "material_name":"material_name"
+        }
+        reordered_data = [""] * len(main_columns)
+
+        for sub_col, main_col in column_mapping.items():
+            if sub_col in sub_columns and main_col in main_columns:
+                sub_idx = sub_columns.index(sub_col)  # mo에서의 인덱스
+                main_idx = main_columns.index(main_col)  # shipping에서의 인덱스
+                reordered_data[main_idx] = original_data[sub_idx]  # 해당 위치에 값 삽입
+
+        return reordered_data
+
     def shipping_process(self):
-        a = self.dbm.query(f"""
-                SELECT 
-                o.order_code,        -- 발주 코드
-                o.order_id,          -- order_id
-                m.mo_code,           -- 생산지시서 코드
-                s.shipping_code,       -- 출고 번호
-                s.quantity,          -- 수량
-                t.material_Code,     -- 자재 코드
-                t.material_Name,     -- 자재 명
-                t.unit,              -- 단위
-                t.price,             -- 가격
-                CURDATE() AS order_date  -- 오늘 날짜
-                FROM order_form o
-                LEFT JOIN mo m ON o.order_code = m.order_code        -- 생산지시서 조인
-                LEFT JOIN shipping s ON o.order_code = s.order_code  -- 출고 정보 조인
-                LEFT JOIN materialTable t ON s.material_Code = t.material_Code  -- 자재 정보 조인
-                WHERE o.order_code = 'ord003';  -- 특정 발주 코드 조회
-        """)
-        print(a)
-        # print(self.check_main_data())
-        # print(self.check_sub_data())
+        for i in self.sub_table.data.keys():
+            if self.sub_table.data[i]['checked']:  # 체크된 행만 이동
+                original_data = self.sub_table.data[i]['data']  # mo 테이블 데이터
+
+                last_shipment_code = self.main_data[-1][0]  # 기본값
+                if self.main_data:  # main_data에 기존 데이터가 있을 경우
+                    last_shipment_code = self.main_data[-1][0]  # 마지막 출고번호 가져오기
+
+                last_number = int(last_shipment_code[3:])  # 'SHP' 이후 숫자만 추출
+                new_shipment_code = f"SHP{last_number + 1:03}"  # 숫자 3자리 형식 유지
+
+                reordered_data = self.reorder_columns(original_data)
+                reordered_data[0] = new_shipment_code
+
+                self.main_data.append(reordered_data)
+                self.save_list.append(reordered_data)
+                self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
+                                          col_width=[130 for _ in range(len(self.main_table_columns))])
+                self.main_table.draw_table()
 
     def check_main_data(self):
         print(f"data: {self.main_table.data}")  # 저장된 데이터
@@ -343,26 +367,66 @@ class Shipping(tk.Frame):
 
     def check_sub_data(self):
         print(f"data: {self.sub_table.data}")  # 저장된 데이터
+        print(self.sub_table.data.keys())
+        # for i in self.sub_table.data.keys():
+        #     print(self.sub_table.data[i]['checked'])
+        #     if self.sub_table.data[i]['checked'] == True:
+        #         print(self.sub_datalist)
+        #         print(self.sub_table.data[i]['data'])
+        #         for j in range(len(self.main_table_columns)):
+        #             if len(self.sub_table.data[i]['data']) < len(self.main_table_columns):
+        #                 self.sub_table.data[i]['data'].append("0")
+        #                 print("빈값 넣기")
+        #             else:
+        #                 break
+        #         self.main_data.append(self.sub_table.data[i]['data'])
+        #         print(self.main_data)
+        #         self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
+        #                                   col_width=[130 for _ in range(len(self.main_table_columns))])
+        #         self.main_table.draw_table()
+        #         print(self.dbm.query("SELECT production_order, order_code from mo where order_code = 'ord0011' "))
+        self.main_data=self.dbm.query("""
+        SELECT m.*, o.*, s.*
+        FROM mo m, order_form o, shipping s
+        """)
+
+
+
         print(f"rows cols: {self.sub_table.rows} {self.sub_table.cols}")  # 행 열 개수
         print(f"selected: {self.sub_table.selected_row} {self.sub_table.selected_col}")  # 선택된 행 열 index
         print(f"changed {self.sub_table.changed}")  # 원본 대비 변경된 데이터
 
-def f20701(**kwargs):
-    result_dict = {}
-    data_dict= kwargs.get("dict")
+    def save_to_db(self):
+        insert_query = """
+            INSERT INTO shipping (shipping_code, order_code, material_classification, quantity, unit, selling_price, vat_price, total_price, material_code, material_name, date, sales_order_number, purchase_order_code, client_code, client_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        self.dbm.transaction([(insert_query, data) for data in self.save_list])
+        print("데이터가 DB에 저장되었습니다.")
+        self.save_list = []
+    @staticmethod
+    def f20701(**kwargs):
+        result_dict = {}
+        data_dict= kwargs.get("dict")
 
-    for key, value in data_dict.items():
-        if key == "order_code":
-            result = dbm.query(f"SELECT * FROM order_form where {key} = '{value}';")
+        for key, value in data_dict.items():
+            if key == "order_code":
+                result = Shipping.dbm.query(f"SELECT * FROM mo where {key} = '{value}';")
+            elif key == "0" or value == 0:
+                result = Shipping.dbm.query(f"SELECT * FROM shipping;")
+            else:
+                result = Shipping.dbm.query(f"SELECT * FROM shipping where {key} = '{value}';")
+
+        if result:
+            result_dict = {"sign": 1, "data": list(result)}
         else:
-            result = dbm.query(f"SELECT * FROM shipping where {key} = '{value}';")
+            result_dict = {"sign": 0, "data": None}
 
-    if result:
-        result_dict = {"sign": 1, "data": list(result)}
-    else:
-        result_dict = {"sign": 0, "data": None}
+        return result_dict
 
-    return result_dict
+    @staticmethod
+    def f20703(**kwargs):
+        pass
 
 if __name__ == "__main__":
     r = tk.Tk()
