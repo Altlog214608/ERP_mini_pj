@@ -161,7 +161,6 @@ class Shipping(tk.Frame):
         self.get_main_all_data("shipping") #테이블 이름에 맞는 데이터 추출
         self.get_sub_all_data("mo")
 
-
         pass
 
     def onkey(self):
@@ -199,43 +198,48 @@ class Shipping(tk.Frame):
     def check_data(self): #데이터 조회 버튼
         if self.tentry1.get() or self.tentry2.get() or self.tentry3.get() or self.tentry4.get() or self.tentry5.get():
             if self.tentry1.get():
+                print("1번")
                 self.sub_table.draw_table()
                 target = self.tentry1.get()
                 self.tentry1.delete(0, tk.END)
-                send_dict = {"code":20709, "order_code":target}
+                send_dict = {"code":20709, "args":{"order_code":target}}
                 self.send_(send_dict)
 
             elif self.tentry2.get():
+                print("2번")
                 self.main_table.draw_table()
                 target = self.tentry2.get()
                 self.tentry2.delete(0, tk.END)
-                send_dict = {"code":20701,self.tentry2.cget("textvariable"): target}
+                send_dict = {"code":20701,"args":{self.tentry2.cget("textvariable"): target}}
                 self.send_(send_dict)
 
             elif self.tentry3.get():
+                print("3번")
                 self.main_table.draw_table()
                 target = self.tentry3.get()
                 self.tentry3.delete(0, tk.END)
-                send_dict = {"code": 20701, self.tentry3.cget("textvariable"): target}
+                send_dict = {"code": 20701, "args":{self.tentry3.cget("textvariable"): target}}
                 self.send_(send_dict)
 
             elif self.tentry4.get():
+                print("4번")
                 self.main_table.draw_table()
                 target = self.tentry4.get()
                 self.tentry4.delete(0, tk.END)
-                send_dict = {"code": 20701, self.tentry4.cget("textvariable"): target}
+                send_dict = {"code": 20701, "args":{self.tentry4.cget("textvariable"): target}}
                 self.send_(send_dict)
 
             elif self.tentry5.get():
+                print("5번")
                 self.main_table.draw_table()
                 target = self.tentry5.get()
                 self.tentry5.delete(0, tk.END)
-                send_dict = {"code": 20701, self.tentry5.cget("textvariable"): target}
+                send_dict = {"code": 20701,"args":{self.tentry5.cget("textvariable"): target}}
                 self.send_(send_dict)
         else:
             self.main_table.draw_table()
             self.tentry2.delete(0, tk.END)
-            send_dict = {"code": 20701, "0": 0}
+            send_dict = {"code": 20701, "args":{"0": 0}}
             self.send_(send_dict)
             print("선택값 없음")
 
@@ -262,9 +266,16 @@ class Shipping(tk.Frame):
 
     def reorder_columns(self, original_data):
         # 컬럼명 리스트 가져오기
-        sub_columns = self.sub_table_columns  # mo 테이블 컬럼명
-        main_columns = self.main_table_columns  # shipping 테이블 컬럼명
+        sub_columns = []
+        main_columns = []
 
+        for r in range(len(self.sub_table_columns)):
+            for i in self.sub_table_columns[r]:
+                sub_columns.append(i)
+
+        for r in range(len(self.main_table_columns)):
+            for i in self.main_table_columns[r]:
+                main_columns.append(i)
 
         column_mapping = {
             "order_code": "order_code",
@@ -281,9 +292,9 @@ class Shipping(tk.Frame):
                 sub_idx = sub_columns.index(sub_col)  # mo에서의 인덱스
                 main_idx = main_columns.index(main_col)  # shipping에서의 인덱스
                 reordered_data[main_idx] = original_data[sub_idx]  # 해당 위치에 값 삽입
-        now = datetime.datetime.now()
-        date_idx = main_columns.index("date")
-        reordered_data[date_idx] = now.strftime("%y-%m-%d")
+        # now = datetime.datetime.now()
+        # date_idx = main_columns.index("date")
+        # reordered_data[date_idx] = now.strftime("%y-%m-%d")
 
         return reordered_data
 
@@ -291,7 +302,7 @@ class Shipping(tk.Frame):
         for i in self.sub_table.data.keys():
             if self.sub_table.data[i]['checked']:  # 체크된 행만 이동
                 original_data = self.sub_table.data[i]['data']  # mo 테이블 데이터
-
+                print("체크된 데이터",self.sub_table.data[i]['checked'])
                 last_shipment_code = self.main_data[-1][0]  # 기본값
                 if self.main_data:  # main_data에 기존 데이터가 있을 경우
                     last_shipment_code = self.main_data[-1][0]  # 마지막 출고번호 가져오기
@@ -302,8 +313,9 @@ class Shipping(tk.Frame):
                 reordered_data = self.reorder_columns(original_data)
                 reordered_data[0] = new_shipment_code
 
+                print(reordered_data)
                 self.main_data.append(reordered_data)
-                self.save_list=reordered_data
+                self.save_list.append(reordered_data)
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
                                           col_width=[130 for _ in range(len(self.main_table_columns))])
                 self.main_table.draw_table()
@@ -323,10 +335,19 @@ class Shipping(tk.Frame):
 
     def save_to_db(self):
         save_dict = {}
-        for i,j in zip(self.main_table_columns,self.save_list):
-            save_dict[i] = j
+        main_columns = []
+        for r in range(len(self.main_table_columns)):
+            for i in self.main_table_columns[r]:
+                main_columns.append(i)
 
-        send_dict = {"code":20703,"dict":save_dict}
+        for r in range(len(self.save_list)):
+            for i,j in zip(main_columns,self.save_list[r]):
+                save_dict[i] = j
+
+        print("저장될 데이터",self.save_list)
+        print("보낼 데이터",save_dict)
+        print("받게될데이터",save_dict.values())
+        send_dict = {"code":20703,"args":save_dict}
         self.save_list = []
         self.send_(send_dict)
 
@@ -342,10 +363,11 @@ class Shipping(tk.Frame):
                     for k,m in zip(self.main_table.data[i]['data'],self.temp_data[i]):
                         if k != m:
                             column_index.append(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
-                            send_data[key_name+str(i)] = self.main_table.data[i]['data'][0],self.main_table_columns[self.main_table.data[i]['data'].index(k)],k
+                            send_data[key_name+str(i)] = self.main_table.data[i]['data'][0],self.main_table_columns[self.main_table.data[i]['data'].index(k)][0],k
                             standard_data.append(self.main_table.data[i]['data'][0])
                             change_data.append(k)
                             i += 1
+
         send_dict = {"code": 20704, "args": send_data}
         self.send_(send_dict)
 
@@ -358,6 +380,12 @@ class Shipping(tk.Frame):
         print(self.main_datalist)
         print(self.main_table_columns)
         if self.main_datalist is not None and self.main_table_columns is not None:
+            # if self.sub_table is not None:
+            #     self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
+            #     self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
+            #                               col_width=[130 for _ in range(len(self.main_table_columns))])
+            #     self.main_table.draw_table()
+            # else:
             self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
             self.temp_data = self.main_data
             # 메인 프레임
@@ -381,8 +409,15 @@ class Shipping(tk.Frame):
         print("여긴가?",self.main_datalist)
         print(self.sub_datalist)
         if self.sub_datalist is not None and self.sub_table_columns is not None:
-            # 서브 데이터 담기
-            self.sub_data = [[f"" for c in range(len(self.sub_table_columns))] for r in range(1)]
+            # if self.sub_table is not None:
+            #     self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
+            #     self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,
+            #                              col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
+            #     self.sub_table.draw_table()
+            # # 서브 데이터 담기
+            # else:
+            self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
+            # self.sub_data = [[f"" for c in range(len(self.sub_table_columns))] for r in range(1)]
             # 서브 프레임
             self.sub_table = TableWidget(self.frame1,
                                          data=self.sub_data,
@@ -403,10 +438,9 @@ class Shipping(tk.Frame):
         print("recv", kwargs)
         if sign == 1:
             if code == 20701:
-                key, value = data.items()
-                self.main_datalist = value[1]
+                self.main_datalist = data
+                # self.main_table_columns = self.get_main_columns("shipping")
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
-                self.main_table_columns = self.get_columns("shipping")
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
                                           col_width=[130 for _ in range(len(self.main_table_columns))])
                 self.main_table.draw_table()
@@ -439,10 +473,11 @@ class Shipping(tk.Frame):
                 self.create_sub_table()
 
             elif code == 20709:
-                key, value = data.items()
-                self.sub_datalist = value[1]
+                # key, value = data.items()
+                print(data)
+                self.sub_datalist = data
+                # self.sub_table_columns = self.get_sub_columns("mo")
                 self.sub_data = [[f"{c}" for c in self.sub_datalist[r]] for r in range(len(self.sub_datalist))]
-                self.sub_table_columns = self.get_columns("mo")
                 self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,
                                          col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
                 self.sub_table.draw_table()
@@ -471,13 +506,16 @@ class Shipping(tk.Frame):
         data_list = list(save_dict.values())
 
         insert_query = """
-            INSERT INTO shipping (shipping_code, order_code, material_classification, quantity, unit, selling_price, vat_price, total_price, material_code, material_name, date, sales_order_number, purchase_order_code, client_code, client_name)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO shipping (shipping_code, order_code, material_classification, quantity, unit, selling_price, vat_price, total_price, material_code, material_name, sales_order_number, purchase_order_code, client_code, client_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        dbm.transaction([(insert_query,tuple(data_list))])
+        result = dbm.transaction([(insert_query,tuple(data_list))])
 
-        result = {"code":20703,"sign":1,"data":None}
-        return result
+        if result is not None:
+            return {"code": 20703, "sign": 1, "data": result}
+        else:
+            return {"code": 20703, "sign": 0, "data": None}
+
 
     @staticmethod
     def f20704(**kwargs): #값 수정
@@ -528,7 +566,7 @@ class Shipping(tk.Frame):
     @staticmethod
     def f20707(**kwargs): #메인테이블 컬럼 가져오기
         result = dbm.query(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'test' AND TABLE_NAME  = '{kwargs.get("args")["tablename"]}' ORDER BY ORDINAL_POSITION;")
+            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs.get("args")["tablename"]}' ORDER BY ORDINAL_POSITION;")
 
         if result != None:
             return {"code": 20707, "sign": 1, "data": result}
@@ -538,7 +576,7 @@ class Shipping(tk.Frame):
     @staticmethod
     def f20708(**kwargs): #서브테이블 컬럼 가져오기
         result = dbm.query(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'test' AND TABLE_NAME  = '{kwargs.get("args")["tablename"]}' ORDER BY ORDINAL_POSITION;")
+            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs.get("args")["tablename"]}' ORDER BY ORDINAL_POSITION;")
 
         if result != None:
             return {"code": 20708, "sign": 1, "data": result}
@@ -569,7 +607,6 @@ class Shipping(tk.Frame):
            print(traceback.format_exc())
            # print(e)
 
-
     def recv_test(self):
         def recv_all(count):
             buf = b""
@@ -580,7 +617,6 @@ class Shipping(tk.Frame):
                 buf += new_buf
                 count -= len(new_buf)
             return buf
-
 
         try:
             while True:
@@ -595,7 +631,6 @@ class Shipping(tk.Frame):
             print(traceback.format_exc())
             # print(e)
 
-
 test_socket = None
 
 if __name__ == "__main__":
@@ -604,6 +639,7 @@ if __name__ == "__main__":
     password = "0000"
     port = 3306
     dbm = dbManager.DBManager(host, user, password, port)
+
     #
     # r = tk.Tk()
     # r.geometry("1300x700")
@@ -632,7 +668,8 @@ if __name__ == "__main__":
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         test_socket = sock
         sock.connect((HOST, PORT))
-        test_frame.after_init()
+        if callable(getattr(test_frame, "after_init", None)):
+            test_frame.after_init()
         t = Thread(target=test_frame.recv_test, args=())
         t.daemon = True
         t.start()
