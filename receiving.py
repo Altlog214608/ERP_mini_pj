@@ -185,16 +185,22 @@ class Receiving(tk.Frame):
                 self.sub_table.draw_table()
                 target = self.tentry1.get()
                 self.tentry1.delete(0, tk.END)
-                send_dict = {"code":20810, "args":{"po_num":target}}
-                self.send_(send_dict)
+                if self.sub_table_flag:
+                    pass
+                else:
+                    send_dict = {"code":20810, "args":{"po_num":target}}
+                    self.send_(send_dict)
 
             elif self.tentry2.get():
                 print("2번")
                 self.main_table.draw_table()
                 target = self.tentry2.get()
-                self.tentry2.delete(0, tk.END)
-                send_dict = {"code":20809,"args":{self.tentry2.cget("textvariable"): target}}
-                self.send_(send_dict)
+                if self.sub_table_flag:
+                    self.tentry2.delete(0, tk.END)
+                    send_dict = {"code":20809,"args":{self.tentry2.cget("textvariable"): target}}
+                    self.send_(send_dict)
+                else:
+                    pass
 
             elif self.tentry3.get():
                 print("3번")
@@ -335,6 +341,8 @@ class Receiving(tk.Frame):
         print(self.save_list)
 
     def save_to_db(self):
+        if self.save_list is None:
+            pass
         save_dict = {}
         main_columns = []
         for r in range(len(self.main_table_columns)):
@@ -617,6 +625,11 @@ class Receiving(tk.Frame):
     #     for key, value in data_dict.items():
     #         result = dbm.query(f"SELECT * FROM purchasing_order where {key} = '{value}';")
     #
+    #     for i, v in enumerate(result):
+    #         for j, w in enumerate(v):
+    #             if type(w) is datetime.datetime:
+    #                 result[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+    #
     #     if result is not None:
     #         result_dict = {"sign": 1, "data": list(result)}
     #     else:
@@ -630,6 +643,11 @@ class Receiving(tk.Frame):
     #     for key, value in kwargs.items():
     #         result = dbm.query(f"SELECT {value} FROM {key}")
     #
+    #     for i, v in enumerate(result):
+    #         for j, w in enumerate(v):
+    #             if type(w) is datetime.datetime:
+    #                 result[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+    #
     #     if result is not None:
     #         return {"sign": 1, "data": result}
     #     else:
@@ -639,6 +657,11 @@ class Receiving(tk.Frame):
     # def f20812(**kwargs): #purchasing 서브테이블 컬럼 가져오기
     #     result = dbm.query(
     #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
+    #
+    #     for i, v in enumerate(result):
+    #         for j, w in enumerate(v):
+    #             if type(w) is datetime.datetime:
+    #                 result[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
     #
     #     if result is not None:
     #         return {"sign": 1, "data": result}
@@ -715,5 +738,4 @@ if __name__ == "__main__":
         t.daemon = True
         t.start()
         root.mainloop()
-
 
