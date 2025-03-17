@@ -374,8 +374,8 @@ class Receiving(tk.Frame):
         self.send_(send_dict)
 
     def send_(self,dict):
-        self.send_test(json.dumps(dict, ensure_ascii=False))
-        # self.root.send_(json.dumps(dict, ensure_ascii=False))
+        # self.send_test(json.dumps(dict, ensure_ascii=False))
+        self.root.send_(json.dumps(dict, ensure_ascii=False))
 
     def create_main_table(self):
         if self.main_datalist is not None and self.main_table_columns is not None:
