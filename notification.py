@@ -14,10 +14,8 @@ class NotificationFrame(tk.Frame):
         self.mainframe = tk.Frame(self, width=350, height=350, bg=Color.GRAY)
         self.mainframe.place(x=0,y=0)
 
-        # "현재 알림이 없습니다." 라벨 추가
         self.empty_label = tk.Label(self.mainframe, text="현재 알림이 없습니다.", fg="black", bg=Color.GRAY, font=("Arial", 12))
-        self.empty_label.place(relx=0.5, rely=0.5, anchor="center")  # 중앙 배치
-
+        self.empty_label.place(relx=0.5, rely=0.5, anchor="center")
 
     def get_nt_len(self):
         return len(self.nt_list) + len(self.old_nt_list)
@@ -33,7 +31,6 @@ class NotificationFrame(tk.Frame):
         self.deployment()
 
     def delete_nt(self, userID):
-        """클릭하여 확인한 알림은 완전히 삭제"""
         index_to_remove = None
         for i, nt in enumerate(self.nt_list):
             if nt.getID() == userID:
@@ -41,11 +38,10 @@ class NotificationFrame(tk.Frame):
                 break
 
         if index_to_remove is not None:
-            del self.nt_list[index_to_remove]  # 리스트에서 삭제
-            self.deployment()  # 화면 다시 그리기
+            del self.nt_list[index_to_remove]
+            self.deployment()
 
     def deployment(self):
-        """old_list에서 가져오는 기능은 유지하되, 클릭한 알림은 복구하지 않음"""
         for widget in self.mainframe.winfo_children():
             widget.grid_forget()
 
@@ -54,10 +50,9 @@ class NotificationFrame(tk.Frame):
             self.nt_list.append(restored_nt)
 
         if not self.nt_list:
-            self.empty_label.place(relx=0.5, rely=0.5, anchor="center")  # 중앙 배치
+            self.empty_label.place(relx=0.5, rely=0.5, anchor="center")
         else:
-            self.empty_label.place_forget()  # 알림이 생기면 숨김
-
+            self.empty_label.place_forget()
 
         for i, item in enumerate(self.nt_list):
             item.grid(row=i, column=0, sticky="ew")
@@ -93,30 +88,53 @@ class Notification(tk.Frame):
         print("frame click",self.mesagge,self.userID)
         nt.delete_nt(self.userID)
 
-def openframe():
-    nt.deployment()
-    nt.place(x=0, y=0)
-
-def testdata():
-    nt.add_notification("123123", "김동현")
-    nt.add_notification("456456", "성진하")
-    nt.add_notification("789789", "박민환")
-    nt.add_notification("112233", "양승준")
-    nt.add_notification("445566", "최정윤")
-    nt.add_notification("778899", "김태연")
-
-def testdata2():
-    nt.add_notification("87987", "이윤서")
-    nt.add_notification("523987", "송기윤")
-
-def hideframe():
-    nt.place_forget()
+# def openframe():
+#     nt.deployment()
+#     nt.place(x=0, y=0)
+#
+# def testdata():
+#     nt.add_notification("123123", "김동현")
+#     nt.add_notification("456456", "성진하")
+#     nt.add_notification("789789", "박민환")
+#     nt.add_notification("112233", "양승준")
+#     nt.add_notification("445566", "최정윤")
+#     nt.add_notification("778899", "김태연")
+#
+# def testdata2():
+#     nt.add_notification("87987", "이윤서")
+#     nt.add_notification("523987", "송기윤")
+#
+# def hideframe():
+#     nt.place_forget()
 
 if __name__ == "__main__":
     r = tk.Tk()
     r.geometry("1300x700")
     r.config(bg="white")
     nt = NotificationFrame(r)
+
+
+    def openframe():
+        nt.deployment()
+        nt.place(x=0, y=0)
+
+
+    def testdata():
+        nt.add_notification("123123", "김동현")
+        nt.add_notification("456456", "성진하")
+        nt.add_notification("789789", "박민환")
+        nt.add_notification("112233", "양승준")
+        nt.add_notification("445566", "최정윤")
+        nt.add_notification("778899", "김태연")
+
+
+    def testdata2():
+        nt.add_notification("87987", "이윤서")
+        nt.add_notification("523987", "송기윤")
+
+
+    def hideframe():
+        nt.place_forget()
 
     test_button = tk.Button(r,text="테스트",command=openframe)
     test_button.pack()
@@ -130,4 +148,3 @@ if __name__ == "__main__":
     test_button5.pack()
 
     r.mainloop()
-
