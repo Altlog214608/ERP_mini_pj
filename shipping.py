@@ -675,4 +675,3 @@ if __name__ == "__main__":
         t.start()
         root.mainloop()
 
-

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox as msgbox
-import dbManager
+# import dbManager
 import naviframe
 from tablewidget import TableWidget
 from color import Color
@@ -224,7 +224,7 @@ class Receiving(tk.Frame):
                 print("6번")
                 self.main_table.draw_table()
                 target = self.tentry6.get()
-                self.tentry5.delete(0, tk.END)
+                self.tentry6.delete(0, tk.END)
                 send_dict = {"code": 20801,"args":{self.tentry6.cget("textvariable"): target}}
                 self.send_(send_dict)
         else:
@@ -397,20 +397,28 @@ class Receiving(tk.Frame):
 
     def create_sub_table(self):
         if self.mo_datalist is not None and self.mo_column is not None:
+            if self.sub_table is None:
+                self.sub_data = [[f"{c}" for c in self.mo_datalist[r]] for r in range(len(self. mo_datalist))]
 
-            self.sub_data = [[f"{c}" for c in self.mo_datalist[r]] for r in range(len(self. mo_datalist))]
+                self.sub_table = TableWidget(self.frame1,
+                                             data=self.sub_data,
+                                             col_name=self.mo_column,
+                                             col_width=[130 for _ in range(len(self.mo_column))],
+                                             width=950,
+                                             height=350)
+                self.sub_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
-            self.sub_table = TableWidget(self.frame1,
-                                         data=self.sub_data,
-                                         col_name=self.mo_column,
-                                         col_width=[130 for _ in range(len(self.mo_column))],
-                                         width=950,
-                                         height=350)
-            self.sub_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
-
-            self.sub_scrollbar = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.sub_table.canvas.xview)
-            self.sub_scrollbar.pack(side="bottom", fill="x")
-            self.sub_table.canvas.configure(xscrollcommand=self.sub_scrollbar.set)
+                self.sub_scrollbar = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.sub_table.canvas.xview)
+                self.sub_scrollbar.pack(side="bottom", fill="x")
+                self.sub_table.canvas.configure(xscrollcommand=self.sub_scrollbar.set)
+            else:
+                print("Updating existing sub_table with new data...")  # 디버깅 로그 추가
+                print("New Data:", self.sub_data)  # 데이터 확인
+                print("New Columns:", self.mo_column)
+                self.sub_data = [[f"{c}" for c in self.mo_datalist[r]] for r in range(len(self.mo_datalist))]
+                self.sub_table.from_data(data=self.sub_data, col_name=self.mo_column,
+                                         col_width=[130 for _ in range(len(self.mo_column))])
+                self.sub_table.draw_table()
 
     def recv(self, **kwargs):
         code = kwargs.get("code")
@@ -419,6 +427,7 @@ class Receiving(tk.Frame):
         print("recv", kwargs)
         if sign == 1:
             if code == 20801:
+                self.main_table.draw_table()
                 self.main_datalist = data
                 self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
@@ -440,19 +449,24 @@ class Receiving(tk.Frame):
 
 
             elif code == 20806:
+                # self.sub_table.draw_table()
                 self.mo_datalist = data
+                self.sub_table_flag = True
                 self.create_sub_table()
 
 
             elif code == 20807:
                 self.main_table_columns = data
-                # self.create_main_table()
+                self.create_main_table()
 
             elif code == 20808:
                 self.mo_column = data
+                self.get_mo_all_data("mo")
+                # self.mo_column = data
                 # self.create_sub_table()
 
             elif code == 20809:
+                self.sub_table.draw_table()
                 self.mo_datalist = data
                 self.sub_table_flag = True
                 self.sub_data = [[f"{c}" for c in self.mo_datalist[r]] for r in range(len(self.mo_datalist))]
@@ -479,157 +493,157 @@ class Receiving(tk.Frame):
             elif code == 20812:
                 self.purchasing_column = data
 
-    @staticmethod
-    def f20801(**kwargs): #발주번호 외 나머지 조회시
-        result_dict = {}
-        data_dict= kwargs
-
-        for key, value in data_dict.items():
-            if key == "0" or value == 0:
-                result = dbm.query(f"SELECT * FROM receiving;")
-            else:
-                result = dbm.query(f"SELECT * FROM receiving where {key} = '{value}';")
-
-        if result is not None:
-            result_dict = {"sign": 1, "data": list(result)}
-        else:
-            result_dict = {"sign": 0, "data": None}
-
-        return result_dict
-
-    @staticmethod
-    def f20803(**kwargs): #저장시 값 db 추가
-        save_dict = kwargs
-        data_list = list(save_dict.values())
-
-        insert_query = """
-            INSERT INTO receiving (receiving_code, order_code, receiving_classification, client_code, client_name, quantity, unit, material_code, material_name, receiving_responsibility, purchase_order_code, plant_code, price)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        result = dbm.transaction([(insert_query,tuple(data_list))])
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-
-    @staticmethod
-    def f20804(**kwargs): #값 수정
-        send_data = kwargs
-
-        update_cases = {}
-        receiving_codes = set()
-
-        for key, (receiving_code, column, value) in send_data.items():
-            if column not in update_cases:
-                update_cases[column] = []
-            update_cases[column].append(f"WHEN receiving_code = '{receiving_code}' THEN '{value}'")
-            receiving_codes.add(f"'{receiving_code}'")
-
-        update_sql = "UPDATE receiving SET \n"
-        update_sql += ",\n".join([
-            f"{column} = CASE \n" + "\n".join(conditions) + "\nEND"
-            for column, conditions in update_cases.items()
-        ])
-        update_sql += f"\nWHERE receiving_code IN ({', '.join(receiving_codes)});"
-        result = dbm.query(update_sql)
-        print("결과",result)
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-    @staticmethod
-    def f20805(**kwargs): #전체 데이터 가져오기
-        for key, value in kwargs.items():
-            result = dbm.query(f"SELECT {value} FROM {key}")
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-    @staticmethod
-    def f20806(**kwargs): # mo 서브테이블 전체 데이터 가져오기
-        for key, value in kwargs.items():
-            result = dbm.query(f"SELECT {value} FROM {key}")
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-    @staticmethod
-    def f20807(**kwargs): #메인테이블 컬럼 가져오기
-        result = dbm.query(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-    @staticmethod
-    def f20808(**kwargs): #mo 서브테이블 컬럼 가져오기
-        result = dbm.query(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
-
-        if result is not None:
-            return {"code": 20808, "sign": 1, "data": result}
-        else:
-            return {"code": 20808, "sign": 0, "data": None}
-
-    @staticmethod
-    def f20809(**kwargs): # mo 서브 테이블 조건 조회 데이터 가져오기
-        result_dict = {}
-        data_dict = kwargs
-
-        for key, value in data_dict.items():
-            result = dbm.query(f"SELECT * FROM mo where {key} = '{value}';")
-
-        if result is not None:
-            result_dict = {"sign": 1, "data": list(result)}
-        else:
-            result_dict = {"sign": 0, "data": None}
-
-        return result_dict
-
-    @staticmethod
-    def f20810(**kwargs): # purchasing_order 서브 테이블 조건 조회 데이터 가져오기
-        result_dict = {}
-        data_dict = kwargs
-
-        for key, value in data_dict.items():
-            result = dbm.query(f"SELECT * FROM purchasing_order where {key} = '{value}';")
-
-        if result is not None:
-            result_dict = {"sign": 1, "data": list(result)}
-        else:
-            result_dict = {"sign": 0, "data": None}
-
-        return result_dict
-
-
-    @staticmethod
-    def f20811(**kwargs): # purchasing 서브테이블 전체 데이터 가져오기
-        for key, value in kwargs.items():
-            result = dbm.query(f"SELECT {value} FROM {key}")
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
-
-    @staticmethod
-    def f20812(**kwargs): #purchasing 서브테이블 컬럼 가져오기
-        result = dbm.query(
-            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
-
-        if result is not None:
-            return {"sign": 1, "data": result}
-        else:
-            return {"sign": 0, "data": None}
+    # @staticmethod
+    # def f20801(**kwargs): #발주번호 외 나머지 조회시
+    #     result_dict = {}
+    #     data_dict= kwargs
+    #
+    #     for key, value in data_dict.items():
+    #         if key == "0" or value == 0:
+    #             result = dbm.query(f"SELECT * FROM receiving;")
+    #         else:
+    #             result = dbm.query(f"SELECT * FROM receiving where {key} = '{value}';")
+    #
+    #     if result is not None:
+    #         result_dict = {"sign": 1, "data": list(result)}
+    #     else:
+    #         result_dict = {"sign": 0, "data": None}
+    #
+    #     return result_dict
+    #
+    # @staticmethod
+    # def f20803(**kwargs): #저장시 값 db 추가
+    #     save_dict = kwargs
+    #     data_list = list(save_dict.values())
+    #
+    #     insert_query = """
+    #         INSERT INTO receiving (receiving_code, order_code, receiving_classification, client_code, client_name, quantity, unit, material_code, material_name, receiving_responsibility, purchase_order_code, plant_code, price)
+    #         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    #     """
+    #     result = dbm.transaction([(insert_query,tuple(data_list))])
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    #
+    # @staticmethod
+    # def f20804(**kwargs): #값 수정
+    #     send_data = kwargs
+    #
+    #     update_cases = {}
+    #     receiving_codes = set()
+    #
+    #     for key, (receiving_code, column, value) in send_data.items():
+    #         if column not in update_cases:
+    #             update_cases[column] = []
+    #         update_cases[column].append(f"WHEN receiving_code = '{receiving_code}' THEN '{value}'")
+    #         receiving_codes.add(f"'{receiving_code}'")
+    #
+    #     update_sql = "UPDATE receiving SET \n"
+    #     update_sql += ",\n".join([
+    #         f"{column} = CASE \n" + "\n".join(conditions) + "\nEND"
+    #         for column, conditions in update_cases.items()
+    #     ])
+    #     update_sql += f"\nWHERE receiving_code IN ({', '.join(receiving_codes)});"
+    #     result = dbm.query(update_sql)
+    #     print("결과",result)
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20805(**kwargs): #전체 데이터 가져오기
+    #     for key, value in kwargs.items():
+    #         result = dbm.query(f"SELECT {value} FROM {key}")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20806(**kwargs): # mo 서브테이블 전체 데이터 가져오기
+    #     for key, value in kwargs.items():
+    #         result = dbm.query(f"SELECT {value} FROM {key}")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20807(**kwargs): #메인테이블 컬럼 가져오기
+    #     result = dbm.query(
+    #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20808(**kwargs): #mo 서브테이블 컬럼 가져오기
+    #     result = dbm.query(
+    #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
+    #
+    #     if result is not None:
+    #         return {"code": 20808, "sign": 1, "data": result}
+    #     else:
+    #         return {"code": 20808, "sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20809(**kwargs): # mo 서브 테이블 조건 조회 데이터 가져오기
+    #     result_dict = {}
+    #     data_dict = kwargs
+    #
+    #     for key, value in data_dict.items():
+    #         result = dbm.query(f"SELECT * FROM mo where {key} = '{value}';")
+    #
+    #     if result is not None:
+    #         result_dict = {"sign": 1, "data": list(result)}
+    #     else:
+    #         result_dict = {"sign": 0, "data": None}
+    #
+    #     return result_dict
+    #
+    # @staticmethod
+    # def f20810(**kwargs): # purchasing_order 서브 테이블 조건 조회 데이터 가져오기
+    #     result_dict = {}
+    #     data_dict = kwargs
+    #
+    #     for key, value in data_dict.items():
+    #         result = dbm.query(f"SELECT * FROM purchasing_order where {key} = '{value}';")
+    #
+    #     if result is not None:
+    #         result_dict = {"sign": 1, "data": list(result)}
+    #     else:
+    #         result_dict = {"sign": 0, "data": None}
+    #
+    #     return result_dict
+    #
+    #
+    # @staticmethod
+    # def f20811(**kwargs): # purchasing 서브테이블 전체 데이터 가져오기
+    #     for key, value in kwargs.items():
+    #         result = dbm.query(f"SELECT {value} FROM {key}")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # def f20812(**kwargs): #purchasing 서브테이블 컬럼 가져오기
+    #     result = dbm.query(
+    #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = '{kwargs["tablename"]}' ORDER BY ORDINAL_POSITION;")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
 
     def send_test(self, msg):
         try:
@@ -679,7 +693,7 @@ if __name__ == "__main__":
     user = "root"
     password = "0000"
     port = 3306
-    dbm = dbManager.DBManager(host, user, password, port)
+    # dbm = dbManager.DBManager(host, user, password, port)
 
     import socket
     from threading import Thread
@@ -701,5 +715,4 @@ if __name__ == "__main__":
         t.daemon = True
         t.start()
         root.mainloop()
-
 
