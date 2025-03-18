@@ -17,8 +17,8 @@ class ErpServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
             self.server_close()
 
 if __name__ == "__main__":
-    # HOST = "localhost"
-    HOST = "192.168.0.29"
+    HOST = "localhost"
+    # HOST = "192.168.0.29"
     PORT = 12345
     server = ErpServer((HOST, PORT), TcpHandler)
     server.run()

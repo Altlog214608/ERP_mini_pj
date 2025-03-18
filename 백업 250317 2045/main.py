@@ -156,11 +156,14 @@ class Main(tk.Tk):
         # self.bt_alarm = tk.Button(self.fr_notification, padx=10, pady=10, text=0, command=self.draw_nt)
         self.bt_alarm = tk.Button(self.fr_notification, image=self.im_alarm, relief="flat", bg=Color.WHITE, command=self.draw_nt)
 
+        self.bt_test = tk.Button(self.fr_notification,command=self.add_nt)
+
         self.im_chat = tk.PhotoImage(file="comment-alt-middle.png")
         self.bt_chat = tk.Button(self.fr_notification, image=self.im_chat, relief="flat", bg=Color.WHITE, command=self.toggle_chat)
 
         self.en_id.place(x=900, y=45)
         self.bt_login.place(x=1050, y=35)
+        self.bt_test.place(x=1000,y=35)
         self.bt_alarm.place(x=1150, y=35)
         self.bt_chat.place(x=1200, y=35)
 
@@ -631,8 +634,8 @@ class Main(tk.Tk):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 self.socket = sock
-                # self.socket.connect(("localhost", 12345))
-                self.socket.connect(("192.168.0.29", 12345))
+                self.socket.connect(("localhost", 12345))
+                # self.socket.connect(("192.168.0.29", 12345))
                 self.screen_main()
 
                 t = threading.Thread(target=self.recv, args=())

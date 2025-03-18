@@ -1506,6 +1506,38 @@ class MsgHandler:
 
     @staticmethod
     @MsgProcessor
+    def f20710(**kwargs):  # materialtable 컬럼 가져오기
+        result = dbm.query(
+            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = 'materialtable' ORDER BY ORDINAL_POSITION;")
+
+        if result is not None:
+            return {"sign": 1, "data": result}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
+    def f20711(**kwargs): #materialtable 테이블 데이터 가져오기
+        result = None
+        result_list = []
+
+        result = dbm.query(f"SELECT * FROM materialtable")
+
+        for i in result:
+            result_list.append(list(i))
+
+        for i, v in enumerate(result_list):
+            for j, w in enumerate(v):
+                if type(w) is datetime.datetime:
+                    result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+
+        if result_list is not None:
+            return {"sign": 1, "data": result_list}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
     def f20801(**kwargs):  # 발주번호 외 나머지 조회시
         result_dict = {}
         result = None
@@ -1639,16 +1671,22 @@ class MsgHandler:
         result_dict = {}
         data_dict = kwargs
 
+        result = None
+        result_list = []
+
         for key, value in data_dict.items():
             result = dbm.query(f"SELECT * FROM purchasing_order where {key} = '{value}';")
 
-        for i, v in enumerate(result):
+        for i in result:
+            result_list.append(list(i))
+
+        for i, v in enumerate(result_list):
             for j, w in enumerate(v):
                 if type(w) is datetime.datetime:
-                    result[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+                    result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
 
         if result is not None:
-            result_dict = {"sign": 1, "data": list(result)}
+            result_dict = {"sign": 1, "data": result_list}
         else:
             result_dict = {"sign": 0, "data": None}
 
@@ -1658,16 +1696,21 @@ class MsgHandler:
     @staticmethod
     @MsgProcessor
     def f20811(**kwargs): # purchasing 서브테이블 전체 데이터 가져오기
+        result = None
+        result_list = []
         for key, value in kwargs.items():
             result = dbm.query(f"SELECT {value} FROM {key}")
 
-        for i, v in enumerate(list(result)):
+        for i in result:
+            result_list.append(list(i))
+
+        for i, v in enumerate(result_list):
             for j, w in enumerate(v):
                 if type(w) is datetime.datetime:
-                    result[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+                    result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
 
-        if result is not None:
-            return {"sign": 1, "data": result}
+        if result_list is not None:
+            return {"sign": 1, "data": result_list}
         else:
             return {"sign": 0, "data": None}
 
@@ -1684,6 +1727,38 @@ class MsgHandler:
 
         if result is not None:
             return {"sign": 1, "data": result}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
+    def f20813(**kwargs):  # materialtable 컬럼 가져오기
+        result = dbm.query(
+            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = 'materialtable' ORDER BY ORDINAL_POSITION;")
+
+        if result is not None:
+            return {"sign": 1, "data": result}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
+    def f20814(**kwargs):  # materialtable 테이블 데이터 가져오기
+        result = None
+        result_list = []
+
+        result = dbm.query(f"SELECT * FROM materialtable")
+
+        for i in result:
+            result_list.append(list(i))
+
+        for i, v in enumerate(result_list):
+            for j, w in enumerate(v):
+                if type(w) is datetime.datetime:
+                    result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+
+        if result_list is not None:
+            return {"sign": 1, "data": result_list}
         else:
             return {"sign": 0, "data": None}
 

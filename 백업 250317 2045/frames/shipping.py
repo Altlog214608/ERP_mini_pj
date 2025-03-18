@@ -88,6 +88,8 @@ class Shipping(tk.Frame):
 
         self.sub_data = []
         self.save_list = []
+        self.material_columns = []
+        self.material_data = []
         # 메인 데이터 담기
         # self.main_data = [[f"{c}" for c in self.main_datalist[r]] for r in range(len(self.main_datalist))]
         # self.temp_data = self.main_data
@@ -144,6 +146,7 @@ class Shipping(tk.Frame):
         self.tlabel5.grid(row=4, column=0, padx=5, pady=10)
         self.tentry5.grid(row=4, column=1, padx=5, pady=10)
 
+
         self.test_button = ttk.Button(self.frame2, text= "조회", command=self.check_data)
         self.test_button.grid(row=0, column=2,pady=5)
         self.test_button2 = ttk.Button(self.frame2, text= "출고", command=self.shipping_process)
@@ -154,13 +157,24 @@ class Shipping(tk.Frame):
         self.test_button3.grid(row=2, column=2,pady=5)
         self.test_button4 = ttk.Button(self.frame2, text= "수정", command=self.update_data)
         self.test_button4.grid(row=3, column=2,pady=5)
+        self.test_button4 = ttk.Button(self.frame2, text= "사용법", command=self.show_message)
+        self.test_button4.grid(row=4, column=2,pady=5)
+
+    def show_message(self):
+        tk.messagebox.showinfo("사용법","""
+        1. 조회 시 Entry에 값 없을 시 maintable 새로 고침 \n
+        2. 조회 필드 왼쪽 테이블에서 원하는 값 체크 후 출고 버튼 누르면 아래 메인 테이블에 값 이동\n
+        3. 출고 버튼으로 메인 테이블에 추가된 데이터 행 DB에 저장\n 
+        4. 아래 메인 테이블에서 엔터 후 값 수정 뒤에 수정 버튼을 누르면 수정 된 값 DB반영
+        """)
 
     def after_init(self):
         self.get_main_columns("shipping")#테이블 이름에 맞는 컬럼명 추출
         self.get_sub_columns("mo")
         self.get_main_all_data("shipping") #테이블 이름에 맞는 데이터 추출
         self.get_sub_all_data("mo")
-
+        self.send_({"code":20710,"args": {}})
+        self.send_({"code":20711,"args": {}})
         pass
 
     def onkey(self):
@@ -264,7 +278,7 @@ class Shipping(tk.Frame):
         send_dict = {"code": 20708, "args": {"tablename": tablename}}
         self.send_(send_dict)
 
-    def reorder_columns(self, original_data):
+    def reorder_columns(self, original_data, index):
         # 컬럼명 리스트 가져오기
         sub_columns = []
         main_columns = []
@@ -277,12 +291,23 @@ class Shipping(tk.Frame):
             for i in self.main_table_columns[r]:
                 main_columns.append(i)
 
+        for r in range(len(self.material_columns)):
+            for i in self.material_columns[r]:
+                sub_columns.append(i)
+
+        for k in self.material_data[index]:
+            original_data.append(k)
+
         column_mapping = {
             "order_code": "order_code",
             "quantity": "quantity",
             "unit": "unit",
             "material_code":"material_code",
-            "material_name":"material_name"
+            "material_name":"material_name",
+            "state":"material_classification",
+            "sellingPrice":"selling_price",
+            "correspondentCode":"client_code",
+            "correspondentName":"client_name"
         }
 
         reordered_data = [0] * len(main_columns)
@@ -292,9 +317,17 @@ class Shipping(tk.Frame):
                 sub_idx = sub_columns.index(sub_col)  # mo에서의 인덱스
                 main_idx = main_columns.index(main_col)  # shipping에서의 인덱스
                 reordered_data[main_idx] = original_data[sub_idx]  # 해당 위치에 값 삽입
+
         # now = datetime.datetime.now()
         # date_idx = main_columns.index("date")
         # reordered_data[date_idx] = now.strftime("%y-%m-%d")
+
+        selling_price_idx = main_columns.index("selling_price")
+        vat_price_idx = main_columns.index("vat_price")
+        total_price_idx = main_columns.index("total_price")
+
+        reordered_data[vat_price_idx] = int(reordered_data[selling_price_idx] / 10)
+        reordered_data[total_price_idx] = reordered_data[selling_price_idx] + reordered_data[vat_price_idx]
 
         return reordered_data
 
@@ -310,7 +343,7 @@ class Shipping(tk.Frame):
                 last_number = int(last_shipment_code[3:])  # 'SHP' 이후 숫자만 추출
                 new_shipment_code = f"SHP{last_number + 1:03}"  # 숫자 3자리 형식 유지
 
-                reordered_data = self.reorder_columns(original_data)
+                reordered_data = self.reorder_columns(original_data, i)
                 reordered_data[0] = new_shipment_code
 
                 print(reordered_data)
@@ -359,6 +392,7 @@ class Shipping(tk.Frame):
         standard_data = []
         key_name = "change_data"
         send_data = {}
+        print("temp_data check:",self.temp_data)
         for i in self.main_table.data.keys():
             for j in self.main_table.changed['updated'].keys():
                 if i == j:
@@ -484,6 +518,14 @@ class Shipping(tk.Frame):
                 self.sub_table.from_data(data=self.sub_data, col_name=self.sub_table_columns,
                                          col_width=[130 for _ in range(len(self.sub_table_columns))])  # 데이터 갱신
                 self.sub_table.draw_table()
+
+            elif code == 20710:
+                self.material_columns = data
+                print("자재테이블 컬럼 가져오기",code,self.material_columns)
+
+            elif code == 20711:
+                self.material_data = data
+                print("자재테이블 전체 데이터 가져오기", code, self.material_data)
     #
     # @staticmethod
     # def f20701(**kwargs): #발주번호 외 나머지 조회시
@@ -600,6 +642,28 @@ class Shipping(tk.Frame):
     #         result_dict = {"sign": 0, "data": None}
     #
     #     return result_dict
+
+    # @staticmethod
+    # @MsgProcessor
+    # def f20710(**kwargs):  # materialtable 컬럼 가져오기
+    #     result = dbm.query(
+    #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = 'materialtable' ORDER BY ORDINAL_POSITION;")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # @MsgProcessor
+    # def f20711(**kwargs): #materialtable 테이블 데이터 가져오기
+    #     for key, value in kwargs.get("args").items():
+    #             result = dbm.query(f"SELECT * FROM materialtable")
+    #
+    #     if result != None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
 
     def send_test(self, msg):
         try:

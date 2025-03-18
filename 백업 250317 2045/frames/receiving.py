@@ -82,6 +82,9 @@ class Receiving(tk.Frame):
         self.sub_data = []
         self.save_list = []
 
+        self.material_columns = []
+        self.material_data = []
+
         self.main_table = None
         self.sub_table = None
 
@@ -131,6 +134,19 @@ class Receiving(tk.Frame):
         self.test_button6 = ttk.Button(self.frame2, text= "생산지시서", command=self.mo_table_load)
         self.test_button6.grid(row=5, column=2,pady=5)
 
+        self.test_button7 = ttk.Button(self.frame2, text= "사용법", command=self.show_message)
+        self.test_button7.grid(row=6, column=2,pady=5)
+
+    def show_message(self):
+        tk.messagebox.showinfo("사용법","""
+        1. 구매오더코드 엔트리 값 조회시 서브테이블(왼쪽 상단 테이블)의 데이터가 생산지시서라면 메인 테이블(아래 테이블만 새로고침)
+        1-1. 서브테이블의 데이터가 구매오더라면 po_num 컬럼에 해당하는 값 입력시 해당 데이터만 출력\n
+        2. 서브 테이블에서 원하는 값 체크 후 입고 버튼 누르면 아래 메인 테이블에 값 이동(구매오더, 생산지시서 상관 없음)\n
+        3. 저장버튼을 누르면 입고 버튼으로 메인 테이블에 추가된 데이터 행 DB에 저장\n 
+        4. 아래 메인 테이블에서 엔터 후 값 수정 뒤에 수정 버튼을 누르면 수정 된 값 DB반영\n
+        5. 구매오더, 생산지시서 버튼은 서브테이블의 데이터를 각각의 데이터로 맞춰 다시 그리고 새로고침 하는 역할
+        """)
+
     def purchase_table_load(self):
         self.get_purchasing_columns("purchasing_order")
         self.get_purchasing_all_data("purchasing_order")
@@ -144,6 +160,8 @@ class Receiving(tk.Frame):
         self.get_mo_columns("mo")
         self.get_main_all_data("receiving") #테이블 이름에 맞는 데이터 추출
         self.get_mo_all_data("mo")
+        self.send_({"code": 20813, "args": {}})
+        self.send_({"code": 20814, "args": {}})
         pass
 
     def onkey(self):
@@ -265,7 +283,7 @@ class Receiving(tk.Frame):
         send_dict = {"code": 20812, "args": {"tablename": tablename}}
         self.send_(send_dict)
 
-    def reorder_columns(self, original_data):
+    def reorder_columns(self, original_data, index):
         # 컬럼명 리스트 가져오기
         sub_columns = []
         main_columns = []
@@ -283,12 +301,28 @@ class Receiving(tk.Frame):
             for i in self.main_table_columns[r]:
                 main_columns.append(i)
 
+        for r in range(len(self.material_columns)):
+            for i in self.material_columns[r]:
+                sub_columns.append(i)
+
+        for k in self.material_data[index]:
+            original_data.append(k)
+
         column_mapping = {
             "order_code": "order_code",
             "quantity": "quantity",
             "unit": "unit",
             "material_code":"material_code",
-            "material_name":"material_name"
+            "mat_code":"material_code",
+            "material_name":"material_name",
+            "amount":"price",
+            "state":"receiving_classification",
+            "measure":"unit",
+            "vendor":"client_code",
+            "po_num":"purchase_order_code",
+            "sellingPrice": "price",
+            "correspondentCode": "client_code",
+            "correspondentName": "client_name"
         }
 
         reordered_data = [0] * len(main_columns)
@@ -298,6 +332,7 @@ class Receiving(tk.Frame):
                 sub_idx = sub_columns.index(sub_col)  # mo에서의 인덱스
                 main_idx = main_columns.index(main_col)
                 reordered_data[main_idx] = original_data[sub_idx]  # 해당 위치에 값 삽입
+
         # now = datetime.datetime.now()
         # date_idx = main_columns.index("date")
         # reordered_data[date_idx] = now.strftime("%y-%m-%d")
@@ -318,7 +353,7 @@ class Receiving(tk.Frame):
                 last_number = int(last_shipment_code[3:])  # 'SHP' 이후 숫자만 추출
                 new_shipment_code = f"REC{last_number + 1:03}"  # 숫자 3자리 형식 유지
 
-                reordered_data = self.reorder_columns(original_data)
+                reordered_data = self.reorder_columns(original_data, i)
                 reordered_data[0] = new_shipment_code
 
                 print(reordered_data)
@@ -502,6 +537,14 @@ class Receiving(tk.Frame):
             elif code == 20812:
                 self.purchasing_column = data
 
+            elif code == 20813:
+                self.material_columns = data
+                print("자재테이블 컬럼 가져오기",code,self.material_columns)
+
+            elif code == 20814:
+                self.material_data = data
+                print("자재테이블 전체 데이터 가져오기", code, self.material_data)
+
     # @staticmethod
     # def f20801(**kwargs): #발주번호 외 나머지 조회시
     #     result_dict = {}
@@ -666,6 +709,38 @@ class Receiving(tk.Frame):
     #
     #     if result is not None:
     #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+
+    # @staticmethod
+    # @MsgProcessor
+    # def f20813(**kwargs):  # materialtable 컬럼 가져오기
+    #     result = dbm.query(
+    #         f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = 'erp_db' AND TABLE_NAME  = 'materialtable' ORDER BY ORDINAL_POSITION;")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": result}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # @staticmethod
+    # @MsgProcessor
+    # def f20814(**kwargs):  # materialtable 테이블 데이터 가져오기
+    #     result = None
+    #     result_list = []
+    #
+    #     result = dbm.query(f"SELECT * FROM materialtable")
+    #
+    #     for i in result:
+    #         result_list.append(list(i))
+    #
+    #     for i, v in enumerate(result_list):
+    #         for j, w in enumerate(v):
+    #             if type(w) is datetime.datetime:
+    #                 result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+    #
+    #     if result_list is not None:
+    #         return {"sign": 1, "data": result_list}
     #     else:
     #         return {"sign": 0, "data": None}
 
