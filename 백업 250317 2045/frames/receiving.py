@@ -410,7 +410,8 @@ class Receiving(tk.Frame):
                         if k != m:
                             column_index.append(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
                             if self.main_table_columns[self.main_table.data[i]['data'].index(k)][0] == "plant_code":
-                                self.send_({"code":20815,"args":{"plant_code": k}})
+                                temp = self.main_table.data[i]['data'][-3]
+                                # self.send_({"code":20815,"args":{"plant_code": k}})
                             send_data[key_name+str(i)] = self.main_table.data[i]['data'][0],self.main_table_columns[self.main_table.data[i]['data'].index(k)][0],k
                             standard_data.append(self.main_table.data[i]['data'][0])
                             change_data.append(k)
@@ -747,14 +748,33 @@ class Receiving(tk.Frame):
     #         return {"sign": 1, "data": result_list}
     #     else:
     #         return {"sign": 0, "data": None}
-
-    def send_test(self, msg):
-        try:
-            encoded = msg.encode()
-            test_socket.send(str(len(encoded)).ljust(16).encode())
-            test_socket.send(encoded)
-        except Exception:
-            print(traceback.format_exc())
+    # @staticmethod
+    # @MsgProcessor
+    # def f20815(**kwargs):  # materialtable 테이블 데이터 가져오기
+    #     result = None
+    #
+    #     result = dbm.query(f"SELECT * FROM materialtable")
+    #
+    #     for i in result:
+    #         result_list.append(list(i))
+    #
+    #     for i, v in enumerate(result_list):
+    #         for j, w in enumerate(v):
+    #             if type(w) is datetime.datetime:
+    #                 result_list[i][j] = w.strftime("%Y-%m-%d %H:%M:%S")
+    #
+    #     if result_list is not None:
+    #         return {"sign": 1, "data": result_list}
+    #     else:
+    #         return {"sign": 0, "data": None}
+    #
+    # def send_test(self, msg):
+    #     try:
+    #         encoded = msg.encode()
+    #         test_socket.send(str(len(encoded)).ljust(16).encode())
+    #         test_socket.send(encoded)
+    #     except Exception:
+    #         print(traceback.format_exc())
 
     def send_test(self, msg):
         try:
