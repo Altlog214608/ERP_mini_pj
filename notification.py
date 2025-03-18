@@ -25,12 +25,12 @@ class NotificationFrame(tk.Frame):
         else:
             return sum
 
-    def add_notification(self,message,userID,userName):
+    def add_notification(self,message,userID,userName, notification_frame):
         if len(self.nt_list) >= 5:
             old_nt = self.nt_list.pop(0)
             self.old_nt_list.append(old_nt)
 
-        new_notification = Notification(self.mainframe, message, userID, userName)
+        new_notification = Notification(self.mainframe, message, userID, userName, notification_frame)
         self.nt_list.append(new_notification)
 
         self.deployment()
@@ -77,10 +77,6 @@ class NotificationFrame(tk.Frame):
     # def send_(self,dict):
     #     self.root.send_(json.dumps(dict, ensure_ascii=False))
 
-
-    # nt.recv(kwargs=test)
-
-
     def recv(self, dict):
         # code = kwargs.get("code")
         # sign = kwargs.get("sign")
@@ -94,19 +90,18 @@ class NotificationFrame(tk.Frame):
             userID = data["sender_id"]
             userName = data["sender_name"]
 
-            self.add_notification(message,userID,userName)
+            self.add_notification(message,userID,userName,self)
             print(message,userID,userName)
 
-
-
 class Notification(tk.Frame):
-    def __init__(self, root, message, userID, userName):
+    def __init__(self, root, message, userID, userName, notification_frame):
         super().__init__(root, width=350, height=70, bg=Color.GRAY )
 
         self.root = root
         self.userID = userID
         self.mesagge = message
         self.userName = userName
+        self.notification_frame = notification_frame
 
         self.nt_frame = tk.Frame(self, width=70, height=70, bg=Color.GRAY, relief="solid", bd=1)
         self.nt_frame.place(x=0,y=0)
@@ -115,7 +110,7 @@ class Notification(tk.Frame):
         self.ui_frame.bind("<Button-1>",self.notification_click)
         self.ui_frame.configure(cursor='hand2')
 
-        self.name_label = tk.Label(self.ui_frame, text=userID, font=("godic",15))
+        self.name_label = tk.Label(self.ui_frame, text=userName, font=("godic",15))
         self.name_label.place(x=5,y=5)
 
         self.mesagge_label = tk.Label(self.ui_frame, text=message)
@@ -129,7 +124,7 @@ class Notification(tk.Frame):
 
     def notification_click(self,e):
         print("frame click",self.mesagge,self.userID, self.userName)
-        nt.delete_nt(self.userID)
+        self.notification_frame.delete_nt(self.get_id())
 
 if __name__ == "__main__":
     r = tk.Tk()
@@ -155,9 +150,6 @@ if __name__ == "__main__":
 
     def hideframe():
         nt.place_forget()
-
-
-
 
     test_button = tk.Button(r,text="테스트",command=openframe)
     test_button.pack()
