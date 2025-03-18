@@ -54,9 +54,9 @@ class Receiving(tk.Frame):
             "구매 오더 코드" : "purchase_order_code"
         }
 
-        self.frame1 = tk.Frame(self, width=950, height=350, bg=Color.GRAY)  # 왼쪽 위 구역
-        self.frame2 = tk.LabelFrame(self,text="조회 필드",width=350, height=350, bg=Color.GRAY)  # 오른쪽 위 구역
-        self.frame3 = tk.Frame(self, width=1300, height=350, bg=Color.WHITE)  # 아래 구역
+        self.frame1 = tk.Frame(self, width=950, height=350)  # 왼쪽 위 구역
+        self.frame2 = tk.Frame(self, width=350, height=350)  # 오른쪽 위 구역
+        self.frame3 = tk.Frame(self, width=1300, height=350)  # 아래 구역
 
         self.frame1.grid_propagate(False)
         self.frame1.pack_propagate(False)
@@ -91,18 +91,18 @@ class Receiving(tk.Frame):
         self.mo_column = []
         self.purchasing_column = []
 
-        self.tlabel1 = ttk.Label(self.frame2, text="구매 오더 코드")
-        self.tentry1 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("구매 오더 코드"))
-        self.tlabel2 = ttk.Label(self.frame2, text="제품 상태")
-        self.tentry2 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("제품 상태"))
-        self.tlabel3 = ttk.Label(self.frame2, text="입고 구분")
-        self.tentry3 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("입고 구분"))
-        self.tlabel4 = ttk.Label(self.frame2, text="자재 코드")
-        self.tentry4 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("자재 코드"))
-        self.tlabel5 = ttk.Label(self.frame2, text="입고 번호")
-        self.tentry5 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("입고 번호"))
-        self.tlabel6 = ttk.Label(self.frame2, text="거래처 코드")
-        self.tentry6 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("거래처 코드"))
+        self.tlabel1 = ttk.Label(self.frame2, text="구매 오더 코드", width=14)
+        self.tentry1 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("구매 오더 코드"), width=18)
+        self.tlabel2 = ttk.Label(self.frame2, text="제품 상태", width=14)
+        self.tentry2 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("제품 상태"), width=18)
+        self.tlabel3 = ttk.Label(self.frame2, text="입고 구분", width=14)
+        self.tentry3 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("입고 구분"), width=18)
+        self.tlabel4 = ttk.Label(self.frame2, text="자재 코드", width=14)
+        self.tentry4 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("자재 코드"), width=18)
+        self.tlabel5 = ttk.Label(self.frame2, text="입고 번호", width=14)
+        self.tentry5 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("입고 번호"), width=18)
+        self.tlabel6 = ttk.Label(self.frame2, text="거래처 코드", width=14)
+        self.tentry6 = ttk.Entry(self.frame2, textvariable=self.receiving_columns.get("거래처 코드"), width=18)
 
         self.tlabel1.grid(row=0, column=0, padx=5, pady=10)
         self.tentry1.grid(row=0, column=1, padx=5, pady=10)
@@ -402,18 +402,20 @@ class Receiving(tk.Frame):
         standard_data = []
         key_name = "change_data"
         send_data = {}
+
         for i in self.main_table.data.keys():
             for j in self.main_table.changed['updated'].keys():
                 if i == j:
                     for k,m in zip(self.main_table.data[i]['data'],self.temp_data[i]):
                         if k != m:
                             column_index.append(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
+                            if self.main_table_columns[self.main_table.data[i]['data'].index(k)][0] == "plant_code":
+                                self.send_({"code":20815,"args":{"plant_code": k}})
                             send_data[key_name+str(i)] = self.main_table.data[i]['data'][0],self.main_table_columns[self.main_table.data[i]['data'].index(k)][0],k
                             standard_data.append(self.main_table.data[i]['data'][0])
                             change_data.append(k)
                             i += 1
-                            # print("값이 제대로 들어왔나?",send_data)
-        # print("그래서 여러개일때 최종본은?", send_data)
+        # print(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
         send_dict = {"code": 20804, "args": send_data}
         self.send_(send_dict)
 
@@ -432,7 +434,8 @@ class Receiving(tk.Frame):
                                           col_width=[130 for _ in range(len(self.main_table_columns))],
                                           # 열 너비(순서대로, 데이터 열 개수와 맞게)
                                           width=1300,
-                                          height=350)
+                                          height=350,
+                                          padding=10)
             self.main_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
             self.main_scrollbar = ttk.Scrollbar(self.frame3, orient="horizontal", command=self.main_table.canvas.xview)
@@ -449,7 +452,8 @@ class Receiving(tk.Frame):
                                              col_name=self.mo_column,
                                              col_width=[130 for _ in range(len(self.mo_column))],
                                              width=950,
-                                             height=350)
+                                             height=350,
+                                             padding=10)
                 self.sub_table.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
                 self.sub_scrollbar = ttk.Scrollbar(self.frame1, orient="horizontal", command=self.sub_table.canvas.xview)

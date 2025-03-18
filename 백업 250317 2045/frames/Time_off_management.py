@@ -23,7 +23,7 @@ class Timeoffmanagement(tk.Frame):
         self.input_frame = tk.LabelFrame(self)
         self.input_frame.place(x=0, y=30, width=950, height=350)
 
-        self.create_input_fields()
+        # self.create_input_fields()
 
         # 제어 프레임 (350x350, 오른쪽 위)
         self.control_frame = tk.LabelFrame(self)
@@ -73,26 +73,26 @@ class Timeoffmanagement(tk.Frame):
         self.save_button2 = ttk.Button(self.new_win, text='취소', width=5, command=self.memo_delete)
         self.save_button2.place(x=250, y=250)
 
-    def create_input_fields(self):
-        # 달력에 대한 프레임
-        self.Calendar_frame = tk.LabelFrame(self)
-        self.Calendar_frame.place(x=0, y=30, width=950, height=350)
-        self.cal = Calendar(self.Calendar_frame,
-                            selectmode='day',
-                            background='white',
-                            foreground='black',
-                            headersbackground='#ADD8E6',
-                            normalforeground='black',
-                            weekendbackground='#BDCDD6',
-                            weekendforground='black',
-                            othermonthforeground='gray50',
-                            othermonthbackground='white',
-                            othermonthweforeground='gray50',
-                            othermonthwebackground='#EEE9DA'
-                            )
-
-        self.cal.pack(fill="both", expand=True, pady=20)
-        self.cal.bind("<<CalendarSelected>>", self.open_new_window)
+    # def create_input_fields(self):
+    #     # 달력에 대한 프레임
+    #     self.Calendar_frame = tk.LabelFrame(self)
+    #     self.Calendar_frame.place(x=0, y=30, width=950, height=350)
+    #     self.cal = Calendar(self.Calendar_frame,
+    #                         selectmode='day',
+    #                         background='white',
+    #                         foreground='black',
+    #                         headersbackground='#ADD8E6',
+    #                         normalforeground='black',
+    #                         weekendbackground='#BDCDD6',
+    #                         weekendforground='black',
+    #                         othermonthforeground='gray50',
+    #                         othermonthbackground='white',
+    #                         othermonthweforeground='gray50',
+    #                         othermonthwebackground='#EEE9DA'
+    #                         )
+    #
+    #     self.cal.pack(fill="both", expand=True, pady=20)
+    #     self.cal.bind("<<CalendarSelected>>", self.open_new_window)
 
     def create_control_fields(self):
         # 왼쪽 입력 필드 (사원코드, 이름)

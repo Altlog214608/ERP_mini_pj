@@ -16,6 +16,7 @@ from tablewidget import TableWidget, ColName
 from color import Color
 # import dbManager
 import json
+from tkinter import ttk
 
 
 class Production_cost_analysis_2(tk.Frame):  # 비용분석 - 2
@@ -126,11 +127,11 @@ class Production_cost_analysis_2(tk.Frame):  # 비용분석 - 2
         self.after(0, self.draw_text, self.table_data)
 
     def draw_text(self, table_data):
-        self.test_label = tk.Label(self.frame4, text="특이사항")
+        self.test_label = ttk.Label(self.frame4, text="특이사항")
         self.test_label.pack(anchor="w")
-        self.test_frame = tk.Frame(self.frame4, width=350, height=300)
+        self.test_frame = tk.Frame(self.frame4, width=350, height=350)
         self.test_frame.place(x=0, y=20)
-        self.test_text = tk.Text(self.test_frame, width=47, height=15)
+        self.test_text = tk.Text(self.test_frame, width=40, height=20)
         self.test_text.config(state="normal")
         self.test_text.place(x=0, y=0)
         # 테이블 데이터
@@ -155,8 +156,7 @@ class Production_cost_analysis_2(tk.Frame):  # 비용분석 - 2
                                  editable=[False, False, False, False],
                                  width=950,  # 테이블 그려질 너비
                                  height=350,
-                                 padding=10,
-                                 relief="solid", bd=1
+                                 padding=10
                                  )  # 테이블 그려질 높이
         self.table.grid(row=0, column=0)
 

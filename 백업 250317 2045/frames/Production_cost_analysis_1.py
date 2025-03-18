@@ -16,6 +16,7 @@ from color import Color
 # import naviframe
 # import dbManager
 import json
+from tkinter import ttk as ttk
 
 class Production_cost_analysis_1(tk.Frame): #비용분석 - 1
 
@@ -62,24 +63,35 @@ class Production_cost_analysis_1(tk.Frame): #비용분석 - 1
                                             editable=[True,True, True],
                                             width=950,  # 테이블 그려질 너비
                                             height=700,
-                                            padding=10,
-                                            relief="solid", bd=1
+                                            padding=10
                                 )  # 테이블 그려질 높이)
 
         self.table.grid(row=0, column=0)
 
-        # frame2에 들어갈 것들
-        self.test_btn1 = tk.Button(self.frame2, text="분석 및 결과보기", bg=Color.BUTTON,command=self.on_click)
-        self.test_btn1.place(x=230, y=30)
+        self.frame2.columnconfigure(0, weight=1)  # 첫 번째 열 가중치
+        self.frame2.columnconfigure(1, weight=1)  # 두 번째 열 가중치
+        self.frame2.columnconfigure(2, weight=1)  # 세 번째 열 가중치
+        self.frame2.columnconfigure(3, weight=1)  # 네 번째 열 가중치 (오른쪽 공간 확보)
 
-        self.test_btn2 = tk.Button(self.frame2, text="계정 과목 검색", bg=Color.BUTTON, command=self.on_serch)
-        self.test_btn2.place(x=230, y=0)
+        # frame2에 들어갈 것들
+        # frame2에 들어갈 것들
+        self.test_btn1 = ttk.Button(self.frame2, text="분석 및 결과보기", command=self.on_click)
+        self.test_btn1.grid(row=0, column=2, columnspan=2, padx=6,pady=10, sticky="e")  # column=2로 조정
+
+        self.test_btn2 = ttk.Button(self.frame2, text="계정 과목 검색", command=self.on_serch)
+        self.test_btn2.grid(row=1, column=2, columnspan=2, padx=6, pady=10, sticky="e")  # column=2로 조정
+
+        self.test_frame = tk.Frame(self.frame2, width=340, height=100, relief="solid", bd=1)
+        self.test_frame.grid(row=2,column=0, columnspan=3, padx=(0,3), sticky="nsew")
+
+        self.how_to_use = ttk.Label(self.test_frame, text="사용법 적는 공간\n 1.사용법 적는 공간사용법 적는 공간사용법 적는 공간2.사용법 적는 공간사용법 적는 공간사용법 적는 공간\n3.테두리 지워주세요.", anchor="w", foreground="red", wraplength=339)
+        self.how_to_use.grid(row=0, column=0,padx=5,sticky="e")
+
 
         # self.test_btn2 = tk.Button(self.frame2, text="계정 과목 검색", bg=Color.BUTTON) #보류
         # self.test_btn2.place(x=230, y=0)
         # self.test_btn2.bind("<Button-1>", lambda e: self.on_key(e))
         # print(self.table.data[0]["data"][0])
-
         self.serch_data = {
             "code": 40603,
             "args": {
@@ -87,6 +99,7 @@ class Production_cost_analysis_1(tk.Frame): #비용분석 - 1
                 "계정과목명":None
             }
         }
+
 
 
     def after_init(self):
