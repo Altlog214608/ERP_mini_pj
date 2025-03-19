@@ -1708,6 +1708,8 @@ class MsgHandler:
         receiving_codes = set()
 
         for key, (receiving_code, column, value) in send_data.items():
+            if column == "plant_code":
+                return {"sign": 1, "data": None}
             if column not in update_cases:
                 update_cases[column] = []
             update_cases[column].append(f"WHEN receiving_code = '{receiving_code}' THEN '{value}'")
@@ -1884,6 +1886,32 @@ class MsgHandler:
 
         if result_list is not None:
             return {"sign": 1, "data": result_list}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
+    def f20815(**kwargs):  # purchasing_order에 plant 값 바꾸기
+        result = None
+
+        for po_num, plant in kwargs.items():
+            result = dbm.query(f"UPDATE purchasing_order SET plant = '{plant}' WHERE po_num = '{po_num}'")
+
+        if result is not None:
+            return {"sign": 1, "data": []}
+        else:
+            return {"sign": 0, "data": None}
+
+    @staticmethod
+    @MsgProcessor
+    def f20816(**kwargs):  # receiving 에 plant_code 값 바꾸기
+        result = None
+
+        for receiving_code, plant in kwargs.items():
+            result = dbm.query(f"UPDATE receiving SET plant_code = '{plant}' WHERE receiving_code = '{receiving_code}'")
+
+        if result is not None:
+            return {"sign": 1, "data": []}
         else:
             return {"sign": 0, "data": None}
 

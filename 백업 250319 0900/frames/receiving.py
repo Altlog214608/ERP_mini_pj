@@ -308,21 +308,29 @@ class Receiving(tk.Frame):
         for k in self.material_data[index]:
             original_data.append(k)
 
+        print(original_data)
+
+        # for i in original_data:
+        #     print("prd찾는 for문 진입")
+        #     if "PRD" in i:
+        #         print("PRD찾기")
+
         column_mapping = {
             "order_code": "order_code",
             "quantity": "quantity",
             "unit": "unit",
             "material_code":"material_code",
             "mat_code":"material_code",
-            "material_name":"material_name",
-            "amount":"price",
+            "materialName":"material_name",
             "state":"receiving_classification",
             "measure":"unit",
             "vendor":"client_code",
             "po_num":"purchase_order_code",
             "sellingPrice": "price",
+            "amount": "price",
             "correspondentCode": "client_code",
-            "correspondentName": "client_name"
+            "correspondentName": "client_name",
+            "plant":"plant_code"
         }
 
         reordered_data = [0] * len(main_columns)
@@ -337,6 +345,18 @@ class Receiving(tk.Frame):
         # date_idx = main_columns.index("date")
         # reordered_data[date_idx] = now.strftime("%y-%m-%d")
 
+        if self.sub_table_flag == False:
+            recl_idx = main_columns.index("receiving_classification")
+            reordered_data[recl_idx] = "원자재 입고"
+
+        print("reorder_data",reordered_data[7])
+        for i in self.material_data:
+            if i[0] == reordered_data[7]:
+                print(i)
+                reordered_data[8] = i[1]
+                print(reordered_data)
+
+        reordered_data[9] = 'e001'
         sub_columns = []
 
         return reordered_data
@@ -402,18 +422,27 @@ class Receiving(tk.Frame):
         standard_data = []
         key_name = "change_data"
         send_data = {}
+
         for i in self.main_table.data.keys():
             for j in self.main_table.changed['updated'].keys():
                 if i == j:
                     for k,m in zip(self.main_table.data[i]['data'],self.temp_data[i]):
                         if k != m:
                             column_index.append(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
+                            if self.main_table_columns[self.main_table.data[i]['data'].index(k)][0] == "plant_code":
+                                temp = self.main_table.data[i]['data'][-3]
+                                rec = self.main_table.data[i]['data'][0]
+
+                                self.send_({"code":20815,"args":{temp: k}})
+
+                                self.send_({"code":20816,"args":{rec: k}})
+
+                                return
                             send_data[key_name+str(i)] = self.main_table.data[i]['data'][0],self.main_table_columns[self.main_table.data[i]['data'].index(k)][0],k
                             standard_data.append(self.main_table.data[i]['data'][0])
                             change_data.append(k)
                             i += 1
-                            # print("값이 제대로 들어왔나?",send_data)
-        # print("그래서 여러개일때 최종본은?", send_data)
+        # print(self.main_table_columns[self.main_table.data[i]['data'].index(k)])
         send_dict = {"code": 20804, "args": send_data}
         self.send_(send_dict)
 
@@ -546,6 +575,12 @@ class Receiving(tk.Frame):
             elif code == 20814:
                 self.material_data = data
                 print("자재테이블 전체 데이터 가져오기", code, self.material_data)
+
+            elif code == 20815:
+                pass
+
+            elif code == 20816:
+                pass
 
     # @staticmethod
     # def f20801(**kwargs): #발주번호 외 나머지 조회시
@@ -745,6 +780,33 @@ class Receiving(tk.Frame):
     #         return {"sign": 1, "data": result_list}
     #     else:
     #         return {"sign": 0, "data": None}
+
+    # @staticmethod
+    # @MsgProcessor
+    # def f20815(**kwargs):  # purchasing_order에 plant 값 바꾸기
+    #     result = None
+    #
+    #     for po_num, plant in kwargs.items():
+    #         result = dbm.query(f"UPDATE purchasing_order SET plant = '{plant}' WHERE po_num = '{po_num}'")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": []}
+    #     else:
+    #         return {"sign": 0, "data": None}
+
+    # @staticmethod
+    # @MsgProcessor
+    # def f20816(**kwargs):  # purchasing_order에 plant 값 바꾸기
+    #     result = None
+    #
+    #     for receiving_code, plant in kwargs.items():
+    #         result = dbm.query(f"UPDATE receiving SET plant_code = '{plant}' WHERE receiving_code = '{receiving_code}'")
+    #
+    #     if result is not None:
+    #         return {"sign": 1, "data": []}
+    #     else:
+    #         return {"sign": 0, "data": None}
+
 
     def send_test(self, msg):
         try:

@@ -299,14 +299,17 @@ class Shipping(tk.Frame):
 
         for k in self.material_data[index]:
             original_data.append(k)
+        print(original_data)
 
         column_mapping = {
             "order_code": "order_code",
             "quantity": "quantity",
             "unit": "unit",
+            "materialCode":"material_code",
             "material_code":"material_code",
+            "materialName":"material_name",
             "material_name":"material_name",
-            "state":"material_classification",
+            "materialType":"material_classification",
             "sellingPrice":"selling_price",
             "correspondentCode":"client_code",
             "correspondentName":"client_name"
@@ -323,6 +326,7 @@ class Shipping(tk.Frame):
         # now = datetime.datetime.now()
         # date_idx = main_columns.index("date")
         # reordered_data[date_idx] = now.strftime("%y-%m-%d")
+        
 
         selling_price_idx = main_columns.index("selling_price")
         vat_price_idx = main_columns.index("vat_price")
@@ -337,6 +341,7 @@ class Shipping(tk.Frame):
         for i in self.sub_table.data.keys():
             if self.sub_table.data[i]['checked']:  # 체크된 행만 이동
                 original_data = self.sub_table.data[i]['data']  # mo 테이블 데이터
+                print(original_data)
                 print("체크된 데이터",self.sub_table.data[i]['checked'])
                 last_shipment_code = self.main_data[-1][0]  # 기본값
                 if self.main_data:  # main_data에 기존 데이터가 있을 경우
@@ -348,7 +353,7 @@ class Shipping(tk.Frame):
                 reordered_data = self.reorder_columns(original_data, i)
                 reordered_data[0] = new_shipment_code
 
-                print(reordered_data)
+                print("에러전 프린트 리오더데이터",reordered_data)
                 self.main_data.append(reordered_data)
                 self.save_list.append(reordered_data)
                 self.main_table.from_data(data=self.main_data, col_name=self.main_table_columns,
